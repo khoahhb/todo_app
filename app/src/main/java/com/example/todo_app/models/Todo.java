@@ -2,11 +2,8 @@ package com.example.todo_app.models;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverters;
-
 
 import java.io.Serializable;
-import java.util.Date;
 
 @Entity(tableName = "todos")
 public class Todo implements Serializable {

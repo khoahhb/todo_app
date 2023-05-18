@@ -1,5 +1,6 @@
 package com.example.todo_app.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -20,14 +21,11 @@ public interface TodoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertTodo(Todo todo);
 
-    @Query("SELECT * FROM todos WHERE title LIKE '%' || :key || '%'")
-    Flowable<List<Todo>> getListTodoFiltering(String key);
+    @Query("SELECT * FROM todos WHERE title LIKE '%' || :keyword || '%'")
+    LiveData<List<Todo>> getListTodoAll(String keyword);
 
-    @Query("SELECT * FROM todos WHERE status=:status")
-    Flowable<List<Todo>> getListTodoByStatus(String status);
-
-    @Query("SELECT * FROM todos WHERE title LIKE '%' || :tile || '%'")
-    Flowable<List<Todo>> getListTodoByTile(String tile);
+    @Query("SELECT * FROM todos WHERE status=:status AND title LIKE '%' || :keyword || '%'")
+    LiveData<List<Todo>> getListTodoByStatus(String status, String keyword);
 
     @Update
     Completable updateTodo(Todo item);

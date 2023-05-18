@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".views.fragments.TodoListFragment">
+
+    <data>
+        <variable
+            name="TodoListViewModel"
+            type="com.example.todo_app.view_models.TodoViewModel" />
+    </data>
+
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:background="@color/white"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.search.SearchBar
+                    android:id="@+id/sbSearchTodo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="50dp"
+                    android:hint="Add a new task" />
+            </com.google.android.material.appbar.AppBarLayout>
+        </RelativeLayout>
+
+        <com.google.android.material.search.SearchView
+            android:id="@+id/svSearchTodo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Search todo"
+            app:layout_anchor="@id/sbSearchTodo">
+        </com.google.android.material.search.SearchView>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="#fff"
+                android:layout_marginTop="100dp"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="0dp">
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <LinearLayout
+                            android:id="@+id/header"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <com.google.android.material.tabs.TabLayout
+                                android:id="@+id/tabStatus"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="50dp" />
+
+                            <Button
+                                android:id="@+id/btnClearAll"
+                                style="@style/Widget.Material3.Button.Icon"
+                                android:backgroundTint="@color/md_theme_light_error"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingLeft="20dp"
+                                android:text="Clear all"
+                                android:textColor="@color/white"
+                                android:textSize="38px"
+                                android:textStyle="bold"
+                                tools:ignore="TextSizeCheck" />
+                        </LinearLayout>
+
+                        <androidx.viewpager2.widget.ViewPager2
+                            android:id="@+id/vpgContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_below="@+id/header" />
+
+                    </RelativeLayout>
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/btnGoAdd"
+                        android:layout_gravity="end"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginBottom="15dp"
+                        android:backgroundTint="@color/md_theme_dark_primaryContainer"
+                        android:contentDescription="Touch to add new drink"
+                        android:src="@drawable/ic_add"
+                        app:fabSize="auto"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:tint="@color/white" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </RelativeLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

@@ -16,9 +16,8 @@ public abstract class TodoDatabase extends RoomDatabase {
 
     public static synchronized TodoDatabase getTodoDatabase(Context context) {
         if (todoDatabase == null) {
-            todoDatabase = Room.databaseBuilder(
-                    context, TodoDatabase.class, "todo_db"
-            ).build();
+            todoDatabase = Room.databaseBuilder( context, TodoDatabase.class, "todo_db"
+                                                ).build();
         }
         return todoDatabase;
     }
