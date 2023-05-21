@@ -1,4 +1,4 @@
-package com.example.todo_app.views.fragments;
+package com.example.todo_app.views.java.fragments;
 
 import android.os.Bundle;
 
@@ -15,22 +15,23 @@ import android.view.ViewGroup;
 
 import com.example.todo_app.R;
 import com.example.todo_app.adapters.TodoAdapter;
-import com.example.todo_app.databinding.FragmentTodoAllBinding;
+import com.example.todo_app.databinding.FragmentTodoCompletedBinding;
 import com.example.todo_app.models.Todo;
 import com.example.todo_app.view_models.TodoViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TodoAllFragment extends Fragment {
+public class TodoCompletedFragment extends Fragment {
 
-    private FragmentTodoAllBinding fragmentTodoAllBinding;
+
+    private FragmentTodoCompletedBinding fragmentTodoCompletedBinding;
     private final TodoViewModel todoViewModel;
     private TodoAdapter todoAdapter;
 
     private List<Todo> todoList;
 
-    public TodoAllFragment(TodoViewModel todoViewModel) {
+    public TodoCompletedFragment(TodoViewModel todoViewModel) {
         this.todoViewModel = todoViewModel;
         this.todoViewModel.resetCheckedList();
         todoList = new ArrayList<>();
@@ -45,22 +46,42 @@ public class TodoAllFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fragmentTodoAllBinding = FragmentTodoAllBinding.inflate(inflater, container, false);
-        View mView = fragmentTodoAllBinding.getRoot();
-        fragmentTodoAllBinding.setTodoAllViewModel(todoViewModel);
+        fragmentTodoCompletedBinding = FragmentTodoCompletedBinding.inflate(inflater, container, false);
+        View mView = fragmentTodoCompletedBinding.getRoot();
+        fragmentTodoCompletedBinding.setTodoCompletedViewModel(todoViewModel);
         return mView;
     }
 
     private void loadTodo() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        fragmentTodoAllBinding.rclvTodoAll.setLayoutManager(linearLayoutManager);
+        fragmentTodoCompletedBinding.rclvTodoCompleted.setLayoutManager(linearLayoutManager);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireContext()
                 , DividerItemDecoration.VERTICAL);
-        fragmentTodoAllBinding.rclvTodoAll.addItemDecoration(dividerItemDecoration);
+        fragmentTodoCompletedBinding.rclvTodoCompleted.addItemDecoration(dividerItemDecoration);
+
+        todoAdapter = new TodoAdapter(todoList, new TodoAdapter.IClickListener() {
+            @Override
+            public void onGoDetailItem(Todo todo) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("editItem", todo);
+                Navigation.findNavController(requireView()).navigate(R.id.todoEditFragment, bundle
+                        , null, null);
+            }
+        }, todoViewModel);
+
+        fragmentTodoCompletedBinding.rclvTodoCompleted.setAdapter(todoAdapter);
+
+        if (todoList.size() > 0) {
+            fragmentTodoCompletedBinding.rclvTodoCompleted.setVisibility(View.VISIBLE);
+            fragmentTodoCompletedBinding.isLoadingTodoCompleted.setVisibility(View.INVISIBLE);
+        } else {
+            fragmentTodoCompletedBinding.rclvTodoCompleted.setVisibility(View.INVISIBLE);
+            fragmentTodoCompletedBinding.isLoadingTodoCompleted.setVisibility(View.VISIBLE);
+        }
 
         todoViewModel.getKeyTranfer().observe(requireActivity(), s ->
-                todoViewModel.getListTodoAll().observe(requireActivity(), items -> {
+                todoViewModel.getListTodoByStatus("Completed").observe(requireActivity(), items -> {
                     if (todoList.size() > 0) {
                         todoList.clear();
                     }
@@ -76,14 +97,14 @@ public class TodoAllFragment extends Fragment {
                         }
                     }, todoViewModel);
 
-                    fragmentTodoAllBinding.rclvTodoAll.setAdapter(todoAdapter);
+                    fragmentTodoCompletedBinding.rclvTodoCompleted.setAdapter(todoAdapter);
 
                     if (todoList.size() > 0) {
-                        fragmentTodoAllBinding.rclvTodoAll.setVisibility(View.VISIBLE);
-                        fragmentTodoAllBinding.isLoadingTodoAll.setVisibility(View.INVISIBLE);
+                        fragmentTodoCompletedBinding.rclvTodoCompleted.setVisibility(View.VISIBLE);
+                        fragmentTodoCompletedBinding.isLoadingTodoCompleted.setVisibility(View.INVISIBLE);
                     } else {
-                        fragmentTodoAllBinding.rclvTodoAll.setVisibility(View.INVISIBLE);
-                        fragmentTodoAllBinding.isLoadingTodoAll.setVisibility(View.VISIBLE);
+                        fragmentTodoCompletedBinding.rclvTodoCompleted.setVisibility(View.INVISIBLE);
+                        fragmentTodoCompletedBinding.isLoadingTodoCompleted.setVisibility(View.VISIBLE);
                     }
 
                 }));

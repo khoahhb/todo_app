@@ -1,4 +1,4 @@
-package com.example.todo_app.views.activities;
+package com.example.todo_app.views.java.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 

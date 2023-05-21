@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/todoListFragment"
-        android:name="com.example.todo_app.views.fragments.TodoListFragment"
+        android:name="com.example.todo_app.views.java.fragments.TodoListFragment"
         android:label="fragment_todo_list"
         tools:layout="@layout/fragment_todo_list" >
         <action
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/todoAddFragment"
-        android:name="com.example.todo_app.views.fragments.TodoAddFragment"
+        android:name="com.example.todo_app.views.java.fragments.TodoAddFragment"
         android:label="fragment_todo_add"
         tools:layout="@layout/fragment_todo_add" >
         <action
@@ -30,7 +30,7 @@
 
     <fragment
         android:id="@+id/todoEditFragment"
-        android:name="com.example.todo_app.views.fragments.TodoEditFragment"
+        android:name="com.example.todo_app.views.java.fragments.TodoEditFragment"
         android:label="fragment_todo_edit"
         tools:layout="@layout/fragment_todo_edit" >
         <action

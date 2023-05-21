@@ -6,9 +6,9 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.todo_app.view_models.TodoViewModel;
-import com.example.todo_app.views.fragments.TodoAllFragment;
-import com.example.todo_app.views.fragments.TodoCompletedFragment;
-import com.example.todo_app.views.fragments.TodoPendingFragment;
+import com.example.todo_app.views.java.fragments.TodoAllFragment;
+import com.example.todo_app.views.java.fragments.TodoCompletedFragment;
+import com.example.todo_app.views.java.fragments.TodoPendingFragment;
 
 public class TabTodoAdapter extends FragmentStateAdapter {
     private final TodoViewModel todoViewModel;

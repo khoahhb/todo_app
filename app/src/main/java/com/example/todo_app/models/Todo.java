@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey;
 import java.io.Serializable;
 
 @Entity(tableName = "todos")
-public class Todo implements Serializable {
+public class Todo implements Serializable{
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String title;
@@ -74,4 +74,5 @@ public class Todo implements Serializable {
     public void setCompletedDate(String completedDate) {
         this.completedDate = completedDate;
     }
+
 }

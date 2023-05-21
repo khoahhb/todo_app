@@ -1,4 +1,4 @@
-package com.example.todo_app.views.fragments;
+package com.example.todo_app.views.java.fragments;
 
 import static android.content.ContentValues.TAG;
 

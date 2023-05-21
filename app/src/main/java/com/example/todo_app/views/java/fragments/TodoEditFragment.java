@@ -1,6 +1,6 @@
-package com.example.todo_app.views.fragments;
+package com.example.todo_app.views.java.fragments;
 
-import android.graphics.Color;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,11 +15,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.todo_app.R;
-import com.example.todo_app.databinding.FragmentTodoAddBinding;
+import com.example.todo_app.databinding.FragmentTodoEditBinding;
 import com.example.todo_app.helpers.HelperFunctions;
 import com.example.todo_app.models.Todo;
 import com.example.todo_app.view_models.TodoViewModel;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,21 +31,33 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class TodoAddFragment extends Fragment {
+public class TodoEditFragment extends Fragment {
 
-    private FragmentTodoAddBinding fragmentTodoAddBinding;
+    private FragmentTodoEditBinding fragmentTodoEditBinding;
     private TodoViewModel todoViewModel;
     private MaterialDatePicker<Long> datePickerCompleted;
     private MaterialDatePicker<Long> datePickerCreated;
+    private Todo todoItem;
 
-    public TodoAddFragment() {
+    public TodoEditFragment() {
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        fragmentTodoAddBinding.tieAddCreatedDate.setOnClickListener(view13 -> {
+        assert getArguments() != null;
+        todoItem = (Todo) getArguments().getSerializable("editItem");
+
+        if (todoItem != null) {
+            fragmentTodoEditBinding.tieEditTitle.setText(todoItem.getTitle());
+            fragmentTodoEditBinding.tieEditDescription.setText(todoItem.getDescription());
+            fragmentTodoEditBinding.tieEditCreatedDate.setText(todoItem.getCreatedDate());
+            fragmentTodoEditBinding.tieEditCompletedDate.setText(todoItem.getCompletedDate());
+            fragmentTodoEditBinding.tieEditStatus.setText(todoItem.getStatus(), false);
+        }
+
+        fragmentTodoEditBinding.tieEditCreatedDate.setOnClickListener(view13 -> {
             if (datePickerCreated.isAdded()) {
                 return;
             }
@@ -52,11 +65,11 @@ public class TodoAddFragment extends Fragment {
             datePickerCreated.addOnPositiveButtonClickListener(selection -> {
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyy", Locale.getDefault());
                 String formattedDate = format.format(new Date(selection));
-                fragmentTodoAddBinding.tieAddCreatedDate.setText(formattedDate);
+                fragmentTodoEditBinding.tieEditCreatedDate.setText(formattedDate);
             });
         });
 
-        fragmentTodoAddBinding.tieAddCompletedDate.setOnClickListener(view14 -> {
+        fragmentTodoEditBinding.tieEditCompletedDate.setOnClickListener(view14 -> {
             if (datePickerCompleted.isAdded()) {
                 return;
             }
@@ -64,20 +77,23 @@ public class TodoAddFragment extends Fragment {
             datePickerCompleted.addOnPositiveButtonClickListener(selection -> {
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyy", Locale.getDefault());
                 String formattedDate = format.format(new Date(selection));
-                fragmentTodoAddBinding.tieAddCompletedDate.setText(formattedDate);
+                fragmentTodoEditBinding.tieEditCompletedDate.setText(formattedDate);
             });
         });
 
-        fragmentTodoAddBinding.btnAddTodo.setOnClickListener(new View.OnClickListener() {
+        fragmentTodoEditBinding.btnEditTodo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Todo todo = new Todo();
 
-                todo.setTitle(fragmentTodoAddBinding.tieAddTitle.getText().toString());
-                todo.setStatus(fragmentTodoAddBinding.tieAddStatus.getText().toString().trim());
-                todo.setDescription(fragmentTodoAddBinding.tieAddDescription.getText().toString());
-                todo.setCreatedDate(fragmentTodoAddBinding.tieAddCreatedDate.getText().toString());
-                todo.setCompletedDate(fragmentTodoAddBinding.tieAddCompletedDate.getText().toString());
+                todo.setId(todoItem.getId());
+                todo.setTitle(fragmentTodoEditBinding.tieEditTitle.getText().toString());
+                todo.setStatus(fragmentTodoEditBinding.tieEditStatus.getText().toString().trim());
+                todo.setDescription(fragmentTodoEditBinding.tieEditDescription.getText().toString());
+                todo.setCreatedDate(fragmentTodoEditBinding.tieEditCreatedDate.getText().toString());
+                todo.setCompletedDate(fragmentTodoEditBinding.tieEditCompletedDate.getText().toString());
+
                 if (isNullOrEmpty(todo.getTitle()) || isNullOrEmpty(todo.getStatus())
                         || isNullOrEmpty(todo.getDescription()) || isNullOrEmpty(todo.getCreatedDate())
                         || isNullOrEmpty(todo.getCompletedDate())) {
@@ -88,12 +104,12 @@ public class TodoAddFragment extends Fragment {
                     try {
                         CompositeDisposable compositeDisposable = new CompositeDisposable();
                         compositeDisposable.add(todoViewModel
-                                .insert(todo)
+                                .update(todo)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(() -> {
                                     HelperFunctions.helpers
-                                            .showSnackBar(view, "Data has been saved successfully!"
+                                            .showSnackBar(view, "Data has been updated successfully!"
                                                     ,25, 135, 84);
                                     Navigation.findNavController(getView()).navigate(R.id.todoListFragment);
                                     compositeDisposable.dispose();
@@ -108,7 +124,43 @@ public class TodoAddFragment extends Fragment {
             }
         });
 
-        fragmentTodoAddBinding.tieAddTitle.addTextChangedListener(new TextWatcher() {
+        fragmentTodoEditBinding.btnDeleteEditTodo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+                builder.setTitle("Confirmation dialog")
+                        .setMessage("Do you really want to delete this todo?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                CompositeDisposable compositeDisposable = new CompositeDisposable();
+                                compositeDisposable.add(todoViewModel
+                                        .delete(todoItem)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(() -> {
+                                            HelperFunctions.helpers
+                                                    .showSnackBar(view, "Data been deleted successfully!"
+                                                            ,25, 135, 84);
+                                            Navigation.findNavController(getView()).navigate(R.id.todoListFragment
+                                                    , null, null, null);
+                                            compositeDisposable.dispose();
+                                        })
+                                );
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
+            }
+        });
+
+        fragmentTodoEditBinding.tieEditTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -121,16 +173,16 @@ public class TodoAddFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (Objects.requireNonNull(fragmentTodoAddBinding.tieAddTitle
-                        .getText()).toString().trim().isEmpty()) {
-                    fragmentTodoAddBinding.tilAddTitle.setError("Field title can't empty");
+                if (Objects.requireNonNull(fragmentTodoEditBinding.tieEditTitle.getText())
+                        .toString().trim().isEmpty()) {
+                    fragmentTodoEditBinding.tilEditTitle.setError("Field title can't empty");
                 } else {
-                    fragmentTodoAddBinding.tilAddTitle.setError(null);
+                    fragmentTodoEditBinding.tilEditTitle.setError(null);
                 }
             }
         });
 
-        fragmentTodoAddBinding.tieAddDescription.addTextChangedListener(new TextWatcher() {
+        fragmentTodoEditBinding.tieEditDescription.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -143,11 +195,11 @@ public class TodoAddFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (Objects.requireNonNull(fragmentTodoAddBinding.tieAddDescription
+                if (Objects.requireNonNull(fragmentTodoEditBinding.tieEditDescription
                         .getText()).toString().trim().isEmpty()) {
-                    fragmentTodoAddBinding.tilAddDescription.setError("Description title can't empty");
+                    fragmentTodoEditBinding.tilEditDescription.setError("Description title can't empty");
                 } else {
-                    fragmentTodoAddBinding.tilAddDescription.setError(null);
+                    fragmentTodoEditBinding.tilEditDescription.setError(null);
                 }
             }
         });
@@ -156,11 +208,11 @@ public class TodoAddFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        fragmentTodoAddBinding = FragmentTodoAddBinding.inflate(inflater, container, false);
-        View mView = fragmentTodoAddBinding.getRoot();
+        fragmentTodoEditBinding = FragmentTodoEditBinding.inflate(inflater, container, false);
+        View mView = fragmentTodoEditBinding.getRoot();
         todoViewModel = new ViewModelProvider(this).get(TodoViewModel.class);
         todoViewModel.resetCheckedList();
-        fragmentTodoAddBinding.setTodoAddViewModel(todoViewModel);
+        fragmentTodoEditBinding.setTodoEditViewModel(todoViewModel);
 
         datePickerCreated = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Pick created date").setSelection(MaterialDatePicker.todayInUtcMilliseconds())
@@ -171,7 +223,6 @@ public class TodoAddFragment extends Fragment {
                 .build();
         return mView;
     }
-
     private boolean isNullOrEmpty(String s) {
         if (s == null) {
             return true;
