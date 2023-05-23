@@ -3,17 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     >
 
-    <data>
-        <variable
-            name="todo"
-            type="com.example.todo_app.models.Todo" />
-    </data>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:outlineProvider="none"
         app:strokeWidth="0dp">
 
@@ -37,10 +31,10 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:paddingStart="10dp"
-                    android:text="@{todo.title}"
                     android:textSize="22sp" />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGoDetail"
+                    android:transitionName="edit"
                     android:layout_width="50dp"
                     android:layout_height="match_parent"
                     android:minWidth="0dp"

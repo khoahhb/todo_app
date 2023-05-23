@@ -104,7 +104,7 @@ public class TodoEditFragment extends Fragment {
                     try {
                         CompositeDisposable compositeDisposable = new CompositeDisposable();
                         compositeDisposable.add(todoViewModel
-                                .update(todo)
+                                .updateTodo(todo)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(() -> {
@@ -135,7 +135,7 @@ public class TodoEditFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 CompositeDisposable compositeDisposable = new CompositeDisposable();
                                 compositeDisposable.add(todoViewModel
-                                        .delete(todoItem)
+                                        .deleteTodo(todoItem)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(() -> {

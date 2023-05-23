@@ -114,7 +114,7 @@ fun TodoEditScreen(
                         val compositeDisposable = CompositeDisposable()
                         compositeDisposable.add(
                             viewModel
-                                .delete(todo)
+                                .deleteTodo(todo)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(Action {
@@ -163,7 +163,7 @@ fun TodoEditScreen(
                         val compositeDisposable = CompositeDisposable()
                         compositeDisposable.add(
                             viewModel
-                                .update(mtodo)
+                                .updateTodo(mtodo)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(Action {

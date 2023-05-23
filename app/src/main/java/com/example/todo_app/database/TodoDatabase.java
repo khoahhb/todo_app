@@ -9,15 +9,17 @@ import androidx.room.RoomDatabase;
 import com.example.todo_app.dao.TodoDao;
 import com.example.todo_app.models.Todo;
 
-@Database(entities = Todo.class, version = 1, exportSchema = false)
+@Database(entities = {Todo.class}, version = 1)
 public abstract class TodoDatabase extends RoomDatabase {
 
     private static TodoDatabase todoDatabase;
 
     public static synchronized TodoDatabase getTodoDatabase(Context context) {
         if (todoDatabase == null) {
-            todoDatabase = Room.databaseBuilder( context, TodoDatabase.class, "todo_db"
-                                                ).build();
+            todoDatabase = Room.databaseBuilder(context.getApplicationContext(),
+                    TodoDatabase.class, "todo_db")
+                    .allowMainThreadQueries()
+                    .build();
         }
         return todoDatabase;
     }

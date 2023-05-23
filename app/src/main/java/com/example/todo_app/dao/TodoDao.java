@@ -17,8 +17,7 @@ import io.reactivex.Flowable;
 
 @Dao
 public interface TodoDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     Completable insertTodo(Todo todo);
 
     @Query("SELECT * FROM todos WHERE title LIKE '%' || :keyword || '%'")

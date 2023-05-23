@@ -108,7 +108,7 @@ fun TodoAddScreen(
                     val compositeDisposable = CompositeDisposable()
                     compositeDisposable.add(
                         viewModel
-                            .insert(todo)
+                            .insertTodo(todo)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(Action {

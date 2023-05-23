@@ -46,7 +46,7 @@ fun SwitchScreen() {
         ) {
 
             Text(
-                text = "Pick a Framework",
+                text = "Pick a Project",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.scrim,
                 fontWeight = FontWeight.Bold,
@@ -67,7 +67,7 @@ fun SwitchScreen() {
             {
                 Text(
                     text = "Java - Material",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }
@@ -85,7 +85,7 @@ fun SwitchScreen() {
             {
                 Text(
                     text = "Jetpack - Material",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }

@@ -18,15 +18,18 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rclvTodoPending"
+            android:scrollbars="vertical"
             android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:transitionGroup="true"
             />
+
         <ProgressBar
             android:id="@+id/isLoadingTodoPending"
             android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
     </LinearLayout>
 </layout>

@@ -70,7 +70,7 @@ public class TodoListFragment extends Fragment {
         fragmentTodoListBinding.btnClearAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (todoViewModel.checkedList.size() == 0) {
+                if (todoViewModel.checkedList.getValue().size() == 0) {
                     HelperFunctions.helpers
                             .showSnackBar(view, "Nothing is selected!"
                                     ,255, 191, 0);
@@ -88,27 +88,11 @@ public class TodoListFragment extends Fragment {
                                     .setText(fragmentTodoListBinding.svSearchTodo.getText());
                             fragmentTodoListBinding.svSearchTodo.hide();
                             todoViewModel.getKeyTranfer()
-                                    .setValue(Objects
+                                    .postValue(Objects
                                             .requireNonNull(fragmentTodoListBinding.svSearchTodo
                                                     .getText()).toString());
                             return false;
                         });
-
-        fragmentTodoListBinding.tabStatus.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-            }
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                fragmentTodoListBinding.svSearchTodo.setText("");
-                fragmentTodoListBinding.sbSearchTodo.setText("");
-                todoViewModel.getKeyTranfer().setValue(Objects
-                        .requireNonNull(fragmentTodoListBinding.svSearchTodo.getText()).toString());
-            }
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
     }
 
     @Override

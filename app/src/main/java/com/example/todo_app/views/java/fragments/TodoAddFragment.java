@@ -83,27 +83,48 @@ public class TodoAddFragment extends Fragment {
                         || isNullOrEmpty(todo.getCompletedDate())) {
                     HelperFunctions.helpers
                             .showSnackBar(view, "Some fields are missing!"
-                                    ,255, 51, 51);
+                                    , 255, 51, 51);
                 } else {
                     try {
                         CompositeDisposable compositeDisposable = new CompositeDisposable();
                         compositeDisposable.add(todoViewModel
-                                .insert(todo)
+                                .insertTodo(todo)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(() -> {
                                     HelperFunctions.helpers
                                             .showSnackBar(view, "Data has been saved successfully!"
-                                                    ,25, 135, 84);
+                                                    , 25, 135, 84);
                                     Navigation.findNavController(getView()).navigate(R.id.todoListFragment);
                                     compositeDisposable.dispose();
                                 })
                         );
+
                     } catch (Exception e) {
                         HelperFunctions.helpers
                                 .showSnackBar(view, e.toString()
-                                        ,255, 51, 51);
+                                        , 255, 51, 51);
                     }
+                }
+            }
+        });
+
+        fragmentTodoAddBinding.btnAddTestData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+
+                    for (int i = 1; i < 30; i++) {
+                        Todo todoTemp = new Todo("Item " + i, "desc", "Pending",
+                                "2023-14-11", "2023-14-11");
+                        testFunct(todoTemp);
+                    }
+                    Navigation.findNavController(getView()).navigate(R.id.todoListFragment);
+
+                } catch (Exception e) {
+                    HelperFunctions.helpers
+                            .showSnackBar(view, e.toString()
+                                    , 255, 51, 51);
                 }
             }
         });
@@ -181,5 +202,16 @@ public class TodoAddFragment extends Fragment {
             }
         }
         return false;
+    }
+
+    public void testFunct(Todo todo) {
+        CompositeDisposable compositeDisposable = new CompositeDisposable();
+        compositeDisposable.add(todoViewModel
+                .insertTodo(todo)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    compositeDisposable.dispose();
+                }));
     }
 }

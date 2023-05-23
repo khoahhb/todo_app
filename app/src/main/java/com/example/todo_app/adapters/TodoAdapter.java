@@ -1,6 +1,7 @@
 package com.example.todo_app.adapters;
 
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todo_app.R;
+import com.example.todo_app.databinding.ItemLoadingBinding;
+import com.example.todo_app.databinding.TodoItemBinding;
 import com.example.todo_app.models.Todo;
 import com.example.todo_app.view_models.TodoViewModel;
 import com.google.android.material.button.MaterialButton;
@@ -18,28 +21,53 @@ import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder> {
+public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private static final int TYPE_ITEM = 1;
+    private static final int TYPE_LOADING = 2;
+    private boolean isLoadingAdd;
 
     private List<Todo> mTodoList;
-    private List<Todo> checkedList;
     private IClickListener mIClickListener;
     private TodoViewModel todoViewModel;
 
-    @NonNull
-    @Override
-    public TodoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                                    .inflate(R.layout.todo_item, parent, false);
-        return new TodoViewHolder(itemView);
+    public interface IClickListener {
+        void onGoDetailItem(Todo todo);
+    }
+
+    public void setData(List<Todo> list) {
+        this.mTodoList = list;
+        notifyDataSetChanged();
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TodoViewHolder holder, int position) {
-        Todo todo = mTodoList.get(position);
-        if (todo == null) {
-            return;
+    public int getItemViewType(int position) {
+        if (mTodoList != null && position == mTodoList.size() - 1 && isLoadingAdd) {
+            return TYPE_LOADING;
         }
-        holder.bind(todo);
+        return TYPE_ITEM;
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (TYPE_ITEM == viewType) {
+            TodoItemBinding itemTodoBinding = TodoItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new TodoViewHolder(itemTodoBinding);
+        } else {
+            ItemLoadingBinding itemLoadingBinding = ItemLoadingBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+
+            return new LoadingViewHolder(itemLoadingBinding);
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder.getItemViewType() == TYPE_ITEM) {
+            Todo todo = mTodoList.get(position);
+            TodoViewHolder todoViewHolder = (TodoViewHolder) holder;
+            todoViewHolder.bind(todo);
+        }
     }
 
     @Override
@@ -50,54 +78,68 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
         return 0;
     }
 
-    public interface IClickListener {
-        void onGoDetailItem(Todo todo);
-    }
 
     public TodoAdapter(List<Todo> mTodoList, IClickListener mIClickListener,
                        TodoViewModel todoViewModel) {
         this.mTodoList = mTodoList;
-        this.checkedList = new ArrayList<>();
         this.mIClickListener = mIClickListener;
         this.todoViewModel = todoViewModel;
     }
 
     public class TodoViewHolder extends RecyclerView.ViewHolder {
-        private CheckBox ckbTitle;
-        private MaterialButton btnGoDetail;
-        public TodoViewHolder(View view) {
-            super(view);
-            ckbTitle = view.findViewById(R.id.ckbTitle);
-            btnGoDetail = view.findViewById(R.id.btnGoDetail);
+
+        private final TodoItemBinding todoItemBinding;
+
+        public TodoViewHolder(@NonNull TodoItemBinding itemTodoBinding) {
+            super(itemTodoBinding.getRoot());
+            this.todoItemBinding = itemTodoBinding;
         }
+
         public void bind(Todo todo) {
-            ckbTitle.setText(todo.getTitle());
-            btnGoDetail.setOnClickListener(new View.OnClickListener() {
+
+            todoItemBinding.ckbTitle.setText(todo.getTitle());
+            todoItemBinding.ckbTitle.setChecked(false);
+
+            List<Todo> checkedList = todoViewModel.getChekedList().getValue();
+
+            todoItemBinding.btnGoDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mIClickListener.onGoDetailItem(todo);
                 }
             });
-            ckbTitle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            todoItemBinding.ckbTitle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if (ckbTitle.isChecked()) {
-                        ckbTitle.setPaintFlags(
-                                ckbTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
-                        );
+                    if (todoItemBinding.ckbTitle.isChecked()) {
+
                         if (!checkedList.contains(todo))
                             checkedList.add(todo);
                     } else {
-                        ckbTitle.setPaintFlags(
-                                ckbTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG
+                        todoItemBinding.ckbTitle.setPaintFlags(
+                                todoItemBinding.ckbTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG
                         );
                         if (checkedList.contains(todo))
                             checkedList.remove(todo);
                     }
-                    todoViewModel.checkedList = checkedList;
+                    todoViewModel.checkedList.postValue(checkedList);
                 }
             });
         }
 
+    }
+
+    public static class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public LoadingViewHolder(@NonNull ItemLoadingBinding itemLoadingBinding) {
+            super(itemLoadingBinding.getRoot());
+        }
+    }
+
+    public void addFooterLoading() {
+        isLoadingAdd = true;
+    }
+
+    public void removeFooterLoading() {
+        isLoadingAdd = false;
     }
 }

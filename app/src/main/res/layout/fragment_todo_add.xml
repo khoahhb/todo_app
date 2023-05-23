@@ -15,6 +15,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
+        android:transitionName="add_fragment"
         >
         <TextView
             android:id="@+id/text_view_id"
@@ -158,8 +159,18 @@
             style="@style/Widget.Material3.Button.Icon"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:text="Add"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            tools:ignore="TextSizeCheck" />
+        <Button
+            android:id="@+id/btnAddTestData"
+            style="@style/Widget.Material3.Button.Icon"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Add Test Data"
             android:textColor="@color/white"
             android:textAlignment="center"
             android:textSize="20dp"

@@ -1,5 +1,6 @@
 package com.example.todo_app.views.jetpack
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -119,7 +120,7 @@ fun TodosScreen(
                         historySearchItem.add(text)
                     active = false
                     viewModel.getKeyTranfer()
-                        .setValue(
+                        .postValue(
                             Objects
                                 .requireNonNull(
                                     text
@@ -140,7 +141,7 @@ fun TodosScreen(
                                     text = ""
                                     active = false
                                     viewModel.getKeyTranfer()
-                                        .setValue(
+                                        .postValue(
                                             Objects
                                                 .requireNonNull(
                                                     text
@@ -231,6 +232,7 @@ fun Tabs(
                     selected = pagerState.currentPage == index,
                     onClick = {
                         scope.launch {
+                            viewModel.resetCheckedList()
                             pagerState.animateScrollToPage(index)
                         }
                     },
@@ -248,21 +250,31 @@ fun Tabs(
                 "Confirmation dialog",
                 "Do you really want to delete these todo?",
                 {
-                    val compositeDisposable = CompositeDisposable()
-                    compositeDisposable.add(
-                        viewModel
-                            .deleteSelectedTodos()
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(Action {
-                                Toast.makeText(
-                                    mContext,
-                                    "Todos has been edit successfully!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                compositeDisposable.dispose()
-                            })
-                    )
+                    var temp: MutableList<Todo> = viewModel.checkedList.value as MutableList<Todo>
+
+                    if (temp.size <= 0)
+                        Toast.makeText(
+                            mContext,
+                            "Selected list is empty!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    else {
+                        val compositeDisposable = CompositeDisposable()
+                        compositeDisposable.add(
+                            viewModel
+                                .deleteSelectedTodos()
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(Action {
+                                    Toast.makeText(
+                                        mContext,
+                                        "Todos has been deleted successfully!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    compositeDisposable.dispose()
+                                })
+                        )
+                    }
                     dialogOpen = false
                 },
                 {
@@ -299,7 +311,6 @@ fun TabContent(
 
 @Composable
 fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: NavHostController) {
-    viewModel.resetCheckedList()
     var todos by remember { mutableStateOf(ArrayList<Todo>()) }
     Column(
         modifier = Modifier.fillMaxSize()
@@ -307,7 +318,7 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
 
         LazyColumn {
             viewModel.getKeyTranfer().observe(owner) {
-                viewModel.listTodoAll
+                viewModel.getListTodoAll(viewModel.getKeyTranfer().value)
                     .observe(owner) { item: List<Todo> ->
                         todos = item as ArrayList<Todo>
                     }
@@ -333,7 +344,6 @@ fun CompletedFragment(
     owner: LifecycleOwner,
     navController: NavHostController
 ) {
-    viewModel.resetCheckedList()
     var todos by remember { mutableStateOf(ArrayList<Todo>()) }
     Column(
         modifier = Modifier.fillMaxSize()
@@ -367,7 +377,6 @@ fun PendingFragment(
     owner: LifecycleOwner,
     navController: NavHostController
 ) {
-    viewModel.resetCheckedList()
     var todos by remember { mutableStateOf(ArrayList<Todo>()) }
     Column(
         modifier = Modifier.fillMaxSize()
@@ -425,13 +434,21 @@ fun TodoItem(
                 onCheckedChange =
                 {
                     isChecked.value = it
-                    if (isChecked.value) {
-                        if (!viewModel.checkedList.contains(todoItem))
-                            viewModel.checkedList.add(todoItem)
-                    } else {
-                        if (viewModel.checkedList.contains(todoItem))
-                            viewModel.checkedList.remove(todoItem)
+
+                    var temp: MutableList<Todo> = viewModel.checkedList.value as MutableList<Todo>
+
+
+                    if (temp != null) {
+                        if (isChecked.value) {
+                            if (!temp.contains(todoItem))
+                                temp.add(todoItem)
+                        } else {
+                            if ((temp.contains(todoItem)))
+                                temp.remove(todoItem)
+                        }
+                        viewModel.checkedList.postValue(temp)
                     }
+
                 }
             )
             if (isChecked.value) {

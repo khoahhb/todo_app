@@ -15,6 +15,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
+        android:transitionName="edit_fragment"
         >
         <TextView
             android:id="@+id/text_view_id"
