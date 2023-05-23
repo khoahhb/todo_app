@@ -1,6 +1,7 @@
 package com.example.todo_app.view_models;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -22,7 +23,9 @@ public class TodoViewModel extends AndroidViewModel {
 
     private LiveData<List<Todo>> mTodos;
 
-    public MutableLiveData<List<Todo>> checkedList = new MutableLiveData<>();
+    public static final MutableLiveData<List<Todo>> checkedList = new MutableLiveData<>();
+    public static final MutableLiveData<List<Todo>> uncheckedList = new MutableLiveData<>();
+
 
     public MutableLiveData<String> keyTranfer = new MutableLiveData<>();
 
@@ -31,6 +34,7 @@ public class TodoViewModel extends AndroidViewModel {
         mRepository = new TodoRepository(application);
         keyTranfer.postValue("");
         checkedList.postValue(new ArrayList<>());
+        uncheckedList.postValue(new ArrayList<>());
     }
 
     public MutableLiveData<String> getKeyTranfer() {
@@ -39,6 +43,9 @@ public class TodoViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<Todo>> getChekedList() {
         return checkedList;
+    }
+    public MutableLiveData<List<Todo>> getUnchekedList() {
+        return uncheckedList;
     }
 
     public LiveData<List<Todo>> getListTodoAll(String keyword) {
@@ -70,11 +77,40 @@ public class TodoViewModel extends AndroidViewModel {
         }
         return mRepository.deleteSelectedTodos(ids);
     }
-
-    public void resetCheckedList() {
-        if (checkedList.getValue() != null) {
-            List<Todo> list = new ArrayList<>();
-            checkedList.postValue(list);
+    public void setCheckItem(Todo todoT, boolean check) {
+        List<Todo> item = checkedList.getValue();
+        assert item != null;
+        if (check) {
+            if (!item.contains(todoT)) {
+                item.add(todoT);
+            }
+        } else {
+            if(item.removeIf(a -> a.equals(todoT))){
+                setUncheckItem(todoT,true);
+            }
         }
+        checkedList.postValue(item);
     }
+    public void setUncheckItem(Todo todoT, boolean check) {
+        List<Todo> item = uncheckedList.getValue();
+        assert item != null;
+        if (check) {
+            if (!item.contains(todoT)) {
+                item.add(todoT);
+            }
+        } else {
+            item.removeIf(a -> a.equals(todoT));
+        }
+        uncheckedList.postValue(item);
+    }
+
+    public void resetUncheckedItem(){
+        List<Todo> item = new ArrayList<>();
+        uncheckedList.postValue(item);
+    }
+    public void resetCheckedItem(){
+        List<Todo> item = new ArrayList<>();
+        checkedList.postValue(item);
+    }
+
 }

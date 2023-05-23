@@ -3,6 +3,7 @@ package com.example.todo_app.views.java.fragments;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,11 +21,14 @@ import com.example.todo_app.helpers.HelperFunctions;
 import com.example.todo_app.models.Todo;
 import com.example.todo_app.view_models.TodoViewModel;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -34,38 +38,35 @@ public class TodoAddFragment extends Fragment {
 
     private FragmentTodoAddBinding fragmentTodoAddBinding;
     private TodoViewModel todoViewModel;
-    private MaterialDatePicker<Long> datePickerCompleted;
-    private MaterialDatePicker<Long> datePickerCreated;
+
+    private MaterialDatePicker<Long> datePicker = null;
 
     public TodoAddFragment() {
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        fragmentTodoAddBinding = FragmentTodoAddBinding.inflate(inflater, container, false);
+        View mView = fragmentTodoAddBinding.getRoot();
+        todoViewModel = new ViewModelProvider(this).get(TodoViewModel.class);
+        fragmentTodoAddBinding.setTodoAddViewModel(todoViewModel);
+
+        fragmentTodoAddBinding.tieAddCreatedDate.setInputType(InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_DATE);
+        fragmentTodoAddBinding.tieAddCompletedDate.setInputType(InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_DATE);
+
+        return mView;
+    }
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         fragmentTodoAddBinding.tieAddCreatedDate.setOnClickListener(view13 -> {
-            if (datePickerCreated.isAdded()) {
-                return;
-            }
-            datePickerCreated.show(getParentFragmentManager(), "Material_Date_Picker2");
-            datePickerCreated.addOnPositiveButtonClickListener(selection -> {
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyy", Locale.getDefault());
-                String formattedDate = format.format(new Date(selection));
-                fragmentTodoAddBinding.tieAddCreatedDate.setText(formattedDate);
-            });
+            showDatePicker(fragmentTodoAddBinding.tieAddCreatedDate );
         });
 
-        fragmentTodoAddBinding.tieAddCompletedDate.setOnClickListener(view14 -> {
-            if (datePickerCompleted.isAdded()) {
-                return;
-            }
-            datePickerCompleted.show(getParentFragmentManager(), "Material_Date_Picker");
-            datePickerCompleted.addOnPositiveButtonClickListener(selection -> {
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyy", Locale.getDefault());
-                String formattedDate = format.format(new Date(selection));
-                fragmentTodoAddBinding.tieAddCompletedDate.setText(formattedDate);
-            });
+        fragmentTodoAddBinding.tieAddCompletedDate.setOnClickListener(view13 -> {
+            showDatePicker(fragmentTodoAddBinding.tieAddCompletedDate );
         });
 
         fragmentTodoAddBinding.btnAddTodo.setOnClickListener(new View.OnClickListener() {
@@ -174,24 +175,21 @@ public class TodoAddFragment extends Fragment {
         });
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        fragmentTodoAddBinding = FragmentTodoAddBinding.inflate(inflater, container, false);
-        View mView = fragmentTodoAddBinding.getRoot();
-        todoViewModel = new ViewModelProvider(this).get(TodoViewModel.class);
-        todoViewModel.resetCheckedList();
-        fragmentTodoAddBinding.setTodoAddViewModel(todoViewModel);
+    private void showDatePicker(TextInputEditText textDate) {
+        
+        if(datePicker == null)
+            datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select date").setSelection(MaterialDatePicker.todayInUtcMilliseconds()).build();
 
-        datePickerCreated = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Pick created date").setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build();
-
-        datePickerCompleted = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Pick completed date").setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build();
-        return mView;
+        datePicker.show(getParentFragmentManager(), "Material_Date_Picker");
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            calendar.setTimeInMillis(selection);
+            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+            String formattedDate = format.format(calendar.getTime());
+            textDate.setText(formattedDate);
+        });
     }
+
 
     private boolean isNullOrEmpty(String s) {
         if (s == null) {
@@ -215,3 +213,11 @@ public class TodoAddFragment extends Fragment {
                 }));
     }
 }
+
+//        datePickerCreated = MaterialDatePicker.Builder.datePicker()
+//                .setTitleText("Pick created date").setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+//                .build();
+//
+//        datePickerCompleted = MaterialDatePicker.Builder.datePicker()
+//                .setTitleText("Pick completed date").setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+//                .build();

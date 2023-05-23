@@ -38,6 +38,7 @@ public class TodoListFragment extends Fragment {
     public TodoListFragment() {
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -121,8 +122,10 @@ public class TodoListFragment extends Fragment {
                                     HelperFunctions.helpers
                                             .showSnackBar(getView(), "Data been deleted successfully!"
                                                     ,25, 135, 84);
-                                    Navigation.findNavController(getView()).navigate(R.id.todoListFragment
-                                            , null, null, null);
+                                    todoViewModel.resetUncheckedItem();
+                                    todoViewModel.resetCheckedItem();
+                                    String temps = new String(todoViewModel.getKeyTranfer().getValue()+"");
+                                    todoViewModel.getKeyTranfer().postValue(temps);
                                     compositeDisposable.dispose();
                                 })
                         );

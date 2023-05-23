@@ -1,5 +1,6 @@
 package com.example.todo_app.models;
 
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -73,4 +74,30 @@ public class Todo implements Serializable {
         this.completedDate = completedDate;
     }
 
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        Todo todoTemp = (Todo) obj;
+        if(this.id == todoTemp.id &&
+                this.title.equals(todoTemp.title) &&
+                this.description.equals(todoTemp.description) &&
+                this.status.equals(todoTemp.status) &&
+                this.createdDate.equals(todoTemp.createdDate) &&
+                this.completedDate.equals(todoTemp.completedDate))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Todo{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", status='" + status + '\'' +
+                ", createdDate='" + createdDate + '\'' +
+                ", completedDate='" + completedDate + '\'' +
+                '}';
+    }
 }

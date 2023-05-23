@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,9 +44,14 @@ public class TodoAllFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        todoAdapter.reloadUnselectedData();
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.todoViewModel.resetCheckedList();
         loadTodo();
     }
 

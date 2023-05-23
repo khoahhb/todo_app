@@ -232,7 +232,6 @@ fun Tabs(
                     selected = pagerState.currentPage == index,
                     onClick = {
                         scope.launch {
-                            viewModel.resetCheckedList()
                             pagerState.animateScrollToPage(index)
                         }
                     },
@@ -250,7 +249,7 @@ fun Tabs(
                 "Confirmation dialog",
                 "Do you really want to delete these todo?",
                 {
-                    var temp: MutableList<Todo> = viewModel.checkedList.value as MutableList<Todo>
+                    var temp: MutableList<Todo> = TodoViewModel.checkedList.value as MutableList<Todo>
 
                     if (temp.size <= 0)
                         Toast.makeText(
@@ -435,18 +434,11 @@ fun TodoItem(
                 {
                     isChecked.value = it
 
-                    var temp: MutableList<Todo> = viewModel.checkedList.value as MutableList<Todo>
+                    if (isChecked.value) {
+                        viewModel.setCheckItem(todoItem,true)
+                    } else {
+                        viewModel.setCheckItem(todoItem,false)
 
-
-                    if (temp != null) {
-                        if (isChecked.value) {
-                            if (!temp.contains(todoItem))
-                                temp.add(todoItem)
-                        } else {
-                            if ((temp.contains(todoItem)))
-                                temp.remove(todoItem)
-                        }
-                        viewModel.checkedList.postValue(temp)
                     }
 
                 }

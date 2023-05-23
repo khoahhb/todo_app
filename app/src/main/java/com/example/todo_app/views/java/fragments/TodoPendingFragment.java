@@ -41,11 +41,14 @@ public class TodoPendingFragment extends Fragment {
     public TodoPendingFragment(TodoViewModel todoViewModel) {
         this.todoViewModel = todoViewModel;
     }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        todoAdapter.reloadUnselectedData();
+    }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.todoViewModel.resetCheckedList();
         loadTodo();
     }
 

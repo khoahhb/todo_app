@@ -1,7 +1,9 @@
 package com.example.todo_app
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.todo_app.models.Todo
 import com.example.todo_app.views.java.activities.FrameActivity
 import com.example.todo_app.views.jetpack.NavActivity
 
@@ -85,6 +88,28 @@ fun SwitchScreen() {
             {
                 Text(
                     text = "Jetpack - Material",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+            Button(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(76.dp)
+                    .padding(bottom = 24.dp),
+                shape = RoundedCornerShape(24.dp),
+                onClick = {
+                    var todo1: Todo = Todo("tile", "desc", "status", "created", "completed")
+                    var todo2: Todo = Todo("tile", "desc", "status", "created", "completed")
+
+                    if(todo1.equals(todo2))
+                        Toast.makeText(mContext, "Vo", Toast.LENGTH_SHORT).show()
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colorScheme.primary)
+            )
+            {
+                Text(
+                    text = "Test function",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimary
                 )

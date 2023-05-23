@@ -21,11 +21,14 @@ import com.example.todo_app.models.Todo;
 import com.example.todo_app.view_models.TodoViewModel;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -35,8 +38,7 @@ public class TodoEditFragment extends Fragment {
 
     private FragmentTodoEditBinding fragmentTodoEditBinding;
     private TodoViewModel todoViewModel;
-    private MaterialDatePicker<Long> datePickerCompleted;
-    private MaterialDatePicker<Long> datePickerCreated;
+    private MaterialDatePicker<Long> datePicker = null;
     private Todo todoItem;
 
     public TodoEditFragment() {
@@ -58,27 +60,11 @@ public class TodoEditFragment extends Fragment {
         }
 
         fragmentTodoEditBinding.tieEditCreatedDate.setOnClickListener(view13 -> {
-            if (datePickerCreated.isAdded()) {
-                return;
-            }
-            datePickerCreated.show(getParentFragmentManager(), "Material_Date_Picker2");
-            datePickerCreated.addOnPositiveButtonClickListener(selection -> {
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyy", Locale.getDefault());
-                String formattedDate = format.format(new Date(selection));
-                fragmentTodoEditBinding.tieEditCreatedDate.setText(formattedDate);
-            });
+            showDatePicker(fragmentTodoEditBinding.tieEditCreatedDate );
         });
 
         fragmentTodoEditBinding.tieEditCompletedDate.setOnClickListener(view14 -> {
-            if (datePickerCompleted.isAdded()) {
-                return;
-            }
-            datePickerCompleted.show(getParentFragmentManager(), "Material_Date_Picker");
-            datePickerCompleted.addOnPositiveButtonClickListener(selection -> {
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyy", Locale.getDefault());
-                String formattedDate = format.format(new Date(selection));
-                fragmentTodoEditBinding.tieEditCompletedDate.setText(formattedDate);
-            });
+            showDatePicker(fragmentTodoEditBinding.tieEditCompletedDate );
         });
 
         fragmentTodoEditBinding.btnEditTodo.setOnClickListener(new View.OnClickListener() {
@@ -142,6 +128,8 @@ public class TodoEditFragment extends Fragment {
                                             HelperFunctions.helpers
                                                     .showSnackBar(view, "Data been deleted successfully!"
                                                             ,25, 135, 84);
+                                            todoViewModel.setCheckItem(todoItem,false);
+                                            todoViewModel.setUncheckItem(todoItem,false);
                                             Navigation.findNavController(getView()).navigate(R.id.todoListFragment
                                                     , null, null, null);
                                             compositeDisposable.dispose();
@@ -211,16 +199,8 @@ public class TodoEditFragment extends Fragment {
         fragmentTodoEditBinding = FragmentTodoEditBinding.inflate(inflater, container, false);
         View mView = fragmentTodoEditBinding.getRoot();
         todoViewModel = new ViewModelProvider(this).get(TodoViewModel.class);
-        todoViewModel.resetCheckedList();
         fragmentTodoEditBinding.setTodoEditViewModel(todoViewModel);
 
-        datePickerCreated = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Pick created date").setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build();
-
-        datePickerCompleted = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Pick completed date").setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build();
         return mView;
     }
     private boolean isNullOrEmpty(String s) {
@@ -232,5 +212,20 @@ public class TodoEditFragment extends Fragment {
             }
         }
         return false;
+    }
+
+    private void showDatePicker(TextInputEditText textDate) {
+
+        if(datePicker == null)
+            datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select date").setSelection(MaterialDatePicker.todayInUtcMilliseconds()).build();
+
+        datePicker.show(getParentFragmentManager(), "Material_Date_Picker");
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            calendar.setTimeInMillis(selection);
+            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+            String formattedDate = format.format(calendar.getTime());
+            textDate.setText(formattedDate);
+        });
     }
 }

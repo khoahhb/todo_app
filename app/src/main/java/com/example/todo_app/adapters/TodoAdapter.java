@@ -40,6 +40,31 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyDataSetChanged();
     }
 
+    public void reloadUnselectedData(){
+        if(mTodoList != null){
+            List<Todo> uncheckedList = todoViewModel.getUnchekedList().getValue();
+            if (uncheckedList != null){
+                int size = uncheckedList.size();
+
+                for (int i = 0; i < size; i++) {
+                    notifyItemChanged(mTodoList.indexOf(uncheckedList.get(i)));
+                }
+
+                todoViewModel.resetUncheckedItem();
+            }
+
+            List<Todo> checkedList = todoViewModel.getChekedList().getValue();
+            if (checkedList != null){
+                int size = checkedList.size();
+
+                for (int i = 0; i < size; i++) {
+                    notifyItemChanged(mTodoList.indexOf(checkedList.get(i)));
+                }
+            }
+        }
+
+    }
+
     @Override
     public int getItemViewType(int position) {
         if (mTodoList != null && position == mTodoList.size() - 1 && isLoadingAdd) {
@@ -66,7 +91,7 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (holder.getItemViewType() == TYPE_ITEM) {
             Todo todo = mTodoList.get(position);
             TodoViewHolder todoViewHolder = (TodoViewHolder) holder;
-            todoViewHolder.bind(todo);
+            todoViewHolder.bind(todo,position);
         }
     }
 
@@ -95,34 +120,51 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.todoItemBinding = itemTodoBinding;
         }
 
-        public void bind(Todo todo) {
+        public void bind(Todo todo, int position) {
 
             todoItemBinding.ckbTitle.setText(todo.getTitle());
-            todoItemBinding.ckbTitle.setChecked(false);
 
             List<Todo> checkedList = todoViewModel.getChekedList().getValue();
 
+            if(checkedList.contains(todo)){
+                todoItemBinding.ckbTitle.setChecked(true);
+                todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            }else{
+                todoItemBinding.ckbTitle.setChecked(false);
+                todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() & ~ Paint.STRIKE_THRU_TEXT_FLAG);
+            }
             todoItemBinding.btnGoDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mIClickListener.onGoDetailItem(todo);
                 }
             });
-            todoItemBinding.ckbTitle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            todoItemBinding.cardItem.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if (todoItemBinding.ckbTitle.isChecked()) {
+                public void onClick(View view) {
 
-                        if (!checkedList.contains(todo))
-                            checkedList.add(todo);
+                    todoItemBinding.ckbTitle.setChecked(!todoItemBinding.ckbTitle.isChecked());
+                    if (todoItemBinding.ckbTitle.isChecked()) {
+                        todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                        todoViewModel.setCheckItem(todo,true);
                     } else {
-                        todoItemBinding.ckbTitle.setPaintFlags(
-                                todoItemBinding.ckbTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG
-                        );
-                        if (checkedList.contains(todo))
-                            checkedList.remove(todo);
+                        todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() & ~ Paint.STRIKE_THRU_TEXT_FLAG);
+                        todoViewModel.setCheckItem(todo,false);
                     }
-                    todoViewModel.checkedList.postValue(checkedList);
+
+                }
+            });
+            todoItemBinding.ckbTitle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if (todoItemBinding.ckbTitle.isChecked()) {
+                        todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                        todoViewModel.setCheckItem(todo,true);
+                    } else {
+                        todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() & ~ Paint.STRIKE_THRU_TEXT_FLAG);
+                        todoViewModel.setCheckItem(todo,false);
+                    }
                 }
             });
         }
