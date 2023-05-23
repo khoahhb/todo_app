@@ -1,24 +1,18 @@
 package com.example.todo_app.adapters;
 
 import android.graphics.Paint;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.todo_app.R;
 import com.example.todo_app.databinding.ItemLoadingBinding;
 import com.example.todo_app.databinding.TodoItemBinding;
 import com.example.todo_app.models.Todo;
 import com.example.todo_app.view_models.TodoViewModel;
-import com.google.android.material.button.MaterialButton;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -40,10 +34,10 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void reloadUnselectedData(){
-        if(mTodoList != null){
+    public void loadChangedData() {
+        if (mTodoList != null) {
             List<Todo> uncheckedList = todoViewModel.getUnchekedList().getValue();
-            if (uncheckedList != null){
+            if (uncheckedList != null) {
                 int size = uncheckedList.size();
 
                 for (int i = 0; i < size; i++) {
