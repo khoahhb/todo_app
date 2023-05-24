@@ -45,8 +45,8 @@ public class TodoRepository {
         return mTodoDao.deleteTodo(todo);
     }
 
-    public Completable deleteSelectedTodos(List<Integer> ids) {
-        return mTodoDao.deleteSelectedTodos(ids);
+    public Completable deleteCheckedTodos(List<Integer> ids) {
+        return mTodoDao.deleteCheckedTodos(ids);
     }
 
 }

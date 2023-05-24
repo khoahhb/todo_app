@@ -1,14 +1,11 @@
 package com.example.todo_app.view_models;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.todo_app.dao.TodoDao;
-import com.example.todo_app.database.TodoDatabase;
 import com.example.todo_app.models.Todo;
 import com.example.todo_app.repositories.TodoRepository;
 
@@ -26,7 +23,6 @@ public class TodoViewModel extends AndroidViewModel {
     public static final MutableLiveData<List<Todo>> checkedList = new MutableLiveData<>();
     public static final MutableLiveData<List<Todo>> uncheckedList = new MutableLiveData<>();
 
-
     public MutableLiveData<String> keyTranfer = new MutableLiveData<>();
 
     public TodoViewModel(Application application) {
@@ -41,10 +37,11 @@ public class TodoViewModel extends AndroidViewModel {
         return keyTranfer;
     }
 
-    public MutableLiveData<List<Todo>> getChekedList() {
+    public MutableLiveData<List<Todo>> getCheckedList() {
         return checkedList;
     }
-    public MutableLiveData<List<Todo>> getUnchekedList() {
+
+    public MutableLiveData<List<Todo>> getUncheckedList() {
         return uncheckedList;
     }
 
@@ -70,13 +67,14 @@ public class TodoViewModel extends AndroidViewModel {
         return mRepository.deleteTodo(todo);
     }
 
-    public Completable deleteSelectedTodos() {
+    public Completable deleteCheckedTodos() {
         List<Integer> ids = new ArrayList<>();
         for (Todo e : checkedList.getValue()) {
             ids.add(e.getId());
         }
-        return mRepository.deleteSelectedTodos(ids);
+        return mRepository.deleteCheckedTodos(ids);
     }
+
     public void setCheckItem(Todo todoT, boolean check) {
         List<Todo> item = checkedList.getValue();
         assert item != null;
@@ -91,6 +89,7 @@ public class TodoViewModel extends AndroidViewModel {
         }
         checkedList.postValue(item);
     }
+
     public void setUncheckItem(Todo todoT, boolean check) {
         List<Todo> item = uncheckedList.getValue();
         assert item != null;
@@ -104,13 +103,13 @@ public class TodoViewModel extends AndroidViewModel {
         uncheckedList.postValue(item);
     }
 
-    public void resetUncheckedItem(){
-        List<Todo> item = new ArrayList<>();
-        uncheckedList.postValue(item);
-    }
-    public void resetCheckedItem(){
+    public void resetCheckedList(){
         List<Todo> item = new ArrayList<>();
         checkedList.postValue(item);
+    }
+    public void resetUncheckedList(){
+        List<Todo> item = new ArrayList<>();
+        uncheckedList.postValue(item);
     }
 
 }

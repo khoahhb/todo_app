@@ -1,7 +1,5 @@
 package com.example.todo_app.views.java.fragments;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.FragmentNavigator;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.todo_app.R;
@@ -43,8 +42,10 @@ public class TodoListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         fragmentTodoListBinding.btnGoAdd.setOnClickListener(view1 -> {
+            FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
+                    .addSharedElement(fragmentTodoListBinding.btnGoAdd, "add_fragment").build();
             Navigation.findNavController(view1).navigate(R.id.todoAddFragment,
-                    null, null, null);
+                    null, null, extras);
         });
 
         ViewPager2 viewPager2 = requireView().findViewById(R.id.vpgContent);
@@ -74,7 +75,7 @@ public class TodoListFragment extends Fragment {
                 if (todoViewModel.checkedList.getValue().size() == 0) {
                     HelperFunctions.helpers
                             .showSnackBar(view, "Nothing is selected!"
-                                    ,255, 191, 0);
+                                    , 255, 191, 0);
                 } else {
                     deleteSelectedTodos();
                 }
@@ -115,17 +116,15 @@ public class TodoListFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         CompositeDisposable compositeDisposable = new CompositeDisposable();
                         compositeDisposable.add(todoViewModel
-                                .deleteSelectedTodos()
+                                .deleteCheckedTodos()
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(() -> {
                                     HelperFunctions.helpers
                                             .showSnackBar(getView(), "Data been deleted successfully!"
-                                                    ,25, 135, 84);
-                                    todoViewModel.resetUncheckedItem();
-                                    todoViewModel.resetCheckedItem();
-                                    String temps = new String(todoViewModel.getKeyTranfer().getValue()+"");
-                                    todoViewModel.getKeyTranfer().postValue(temps);
+                                                    , 25, 135, 84);
+                                    todoViewModel.resetUncheckedList();
+                                    todoViewModel.resetCheckedList();
                                     compositeDisposable.dispose();
                                 })
                         );

@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.FragmentNavigator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -40,6 +42,7 @@ public class TodoCompletedFragment extends Fragment {
     public TodoCompletedFragment(TodoViewModel todoViewModel) {
         this.todoViewModel = todoViewModel;
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -69,13 +72,15 @@ public class TodoCompletedFragment extends Fragment {
                 , DividerItemDecoration.VERTICAL);
         fragmentTodoCompletedBinding.rclvTodoCompleted.addItemDecoration(dividerItemDecoration);
 
-        todoAdapter = new TodoAdapter(todoAllList, new TodoAdapter.IClickListener() {
+        todoAdapter = new TodoAdapter(todoAllList, new TodoAdapter.TodoClickListener() {
             @Override
-            public void onGoDetailItem(Todo todo) {
+            public void onGoDetailItem(Todo todo, CardView cardView) {
+                FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
+                        .addSharedElement(cardView, "edit_fragment").build();
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("editItem", todo);
                 Navigation.findNavController(requireView()).navigate(R.id.todoEditFragment
-                        , bundle, null, null);
+                        , bundle, null, extras);
             }
         }, todoViewModel);
 
@@ -101,10 +106,12 @@ public class TodoCompletedFragment extends Fragment {
                 currentPage += 1;
                 loadNextPage();
             }
+
             @Override
             public boolean isLoading() {
                 return isLoading;
             }
+
             @Override
             public boolean isLastPage() {
                 return isLastPage;

@@ -30,6 +30,9 @@ import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import java.time.LocalDate
+typealias ComposableFun = @Composable () -> Unit
+
+class TabItem(var title: String, var screen: ComposableFun)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
@@ -208,4 +211,6 @@ fun CustomAlertDialog(
         )
     }
 }
+
+
 

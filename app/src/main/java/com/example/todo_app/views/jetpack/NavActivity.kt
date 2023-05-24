@@ -49,8 +49,8 @@ fun MainFrame(
                     when (initialState.destination.route) {
                         "add_todo_page", "edit_todo_page/{todo}" ->
                             slideIntoContainer(
-                                AnimatedContentScope.SlideDirection.Left,
-                                animationSpec = tween(700)
+                                AnimatedContentScope.SlideDirection.Start,
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -60,8 +60,8 @@ fun MainFrame(
                     when (targetState.destination.route) {
                         "add_todo_page", "edit_todo_page/{todo}" ->
                             slideOutOfContainer(
-                                AnimatedContentScope.SlideDirection.Left,
-                                animationSpec = tween(700)
+                                AnimatedContentScope.SlideDirection.Right,
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -72,7 +72,7 @@ fun MainFrame(
                         "add_todo_page", "edit_todo_page/{todo}" ->
                             slideIntoContainer(
                                 AnimatedContentScope.SlideDirection.Right,
-                                animationSpec = tween(700)
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -82,8 +82,8 @@ fun MainFrame(
                     when (targetState.destination.route) {
                         "add_todo_page", "edit_todo_page/{todo}" ->
                             slideOutOfContainer(
-                                AnimatedContentScope.SlideDirection.Right,
-                                animationSpec = tween(700)
+                                AnimatedContentScope.SlideDirection.End,
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -100,8 +100,8 @@ fun MainFrame(
                     when (initialState.destination.route) {
                         "todos_page" ->
                             slideIntoContainer(
-                                AnimatedContentScope.SlideDirection.Left,
-                                animationSpec = tween(700)
+                                AnimatedContentScope.SlideDirection.End,
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -111,8 +111,8 @@ fun MainFrame(
                     when (targetState.destination.route) {
                         "todos_page" ->
                             slideOutOfContainer(
-                                AnimatedContentScope.SlideDirection.Left,
-                                animationSpec = tween(700)
+                                AnimatedContentScope.SlideDirection.Right,
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -123,7 +123,7 @@ fun MainFrame(
                         "todos_page" ->
                             slideIntoContainer(
                                 AnimatedContentScope.SlideDirection.Right,
-                                animationSpec = tween(700)
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -134,7 +134,7 @@ fun MainFrame(
                         "todos_page" ->
                             slideOutOfContainer(
                                 AnimatedContentScope.SlideDirection.Right,
-                                animationSpec = tween(700)
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -152,8 +152,8 @@ fun MainFrame(
                     when (initialState.destination.route) {
                         "todos_page" ->
                             slideIntoContainer(
-                                AnimatedContentScope.SlideDirection.Left,
-                                animationSpec = tween(700)
+                                AnimatedContentScope.SlideDirection.Right,
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -163,8 +163,8 @@ fun MainFrame(
                     when (targetState.destination.route) {
                         "todos_page" ->
                             slideOutOfContainer(
-                                AnimatedContentScope.SlideDirection.Left,
-                                animationSpec = tween(700)
+                                AnimatedContentScope.SlideDirection.Right,
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -174,8 +174,8 @@ fun MainFrame(
                     when (initialState.destination.route) {
                         "todos_page" ->
                             slideIntoContainer(
-                                AnimatedContentScope.SlideDirection.Right,
-                                animationSpec = tween(700)
+                                AnimatedContentScope.SlideDirection.Start,
+                                animationSpec = tween(550)
                             )
 
                         else -> null
@@ -185,13 +185,14 @@ fun MainFrame(
                     when (targetState.destination.route) {
                         "todos_page" ->
                             slideOutOfContainer(
-                                AnimatedContentScope.SlideDirection.Right,
-                                animationSpec = tween(700)
+                                AnimatedContentScope.SlideDirection.Start,
+                                animationSpec = tween(550)
                             )
 
                         else -> null
                     }
                 }) { backStackEntry ->
+
                 val todoJson = backStackEntry.arguments?.getString("todo")
                 val moshi = Moshi.Builder().build()
                 val jsonAdapter = moshi.adapter(Todo::class.java).lenient()

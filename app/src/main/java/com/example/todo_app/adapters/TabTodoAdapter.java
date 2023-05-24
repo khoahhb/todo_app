@@ -11,6 +11,7 @@ import com.example.todo_app.views.java.fragments.TodoCompletedFragment;
 import com.example.todo_app.views.java.fragments.TodoPendingFragment;
 
 public class TabTodoAdapter extends FragmentStateAdapter {
+
     private final TodoViewModel todoViewModel;
 
     @NonNull
@@ -35,4 +36,5 @@ public class TabTodoAdapter extends FragmentStateAdapter {
         super(fragmentActivity);
         this.todoViewModel = todoViewModel;
     }
+
 }

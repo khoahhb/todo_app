@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +27,6 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -60,11 +61,11 @@ public class TodoEditFragment extends Fragment {
         }
 
         fragmentTodoEditBinding.tieEditCreatedDate.setOnClickListener(view13 -> {
-            showDatePicker(fragmentTodoEditBinding.tieEditCreatedDate );
+            showDatePicker(fragmentTodoEditBinding.tieEditCreatedDate);
         });
 
         fragmentTodoEditBinding.tieEditCompletedDate.setOnClickListener(view14 -> {
-            showDatePicker(fragmentTodoEditBinding.tieEditCompletedDate );
+            showDatePicker(fragmentTodoEditBinding.tieEditCompletedDate);
         });
 
         fragmentTodoEditBinding.btnEditTodo.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +86,7 @@ public class TodoEditFragment extends Fragment {
                         || isNullOrEmpty(todo.getCompletedDate())) {
                     HelperFunctions.helpers
                             .showSnackBar(view, "Some fields are missing!"
-                                    ,255, 51, 51);
+                                    , 255, 51, 51);
                 } else {
                     try {
                         CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -96,15 +97,15 @@ public class TodoEditFragment extends Fragment {
                                 .subscribe(() -> {
                                     HelperFunctions.helpers
                                             .showSnackBar(view, "Data has been updated successfully!"
-                                                    ,25, 135, 84);
-                                    Navigation.findNavController(getView()).navigate(R.id.todoListFragment);
+                                                    , 25, 135, 84);
+                                    Navigation.findNavController(getView()).popBackStack(R.id.todoListFragment, true);
                                     compositeDisposable.dispose();
                                 })
                         );
                     } catch (Exception e) {
                         HelperFunctions.helpers
                                 .showSnackBar(view, e.toString()
-                                        ,255, 51, 51);
+                                        , 255, 51, 51);
                     }
                 }
             }
@@ -127,11 +128,10 @@ public class TodoEditFragment extends Fragment {
                                         .subscribe(() -> {
                                             HelperFunctions.helpers
                                                     .showSnackBar(view, "Data been deleted successfully!"
-                                                            ,25, 135, 84);
-                                            todoViewModel.setCheckItem(todoItem,false);
-                                            todoViewModel.setUncheckItem(todoItem,false);
-                                            Navigation.findNavController(getView()).navigate(R.id.todoListFragment
-                                                    , null, null, null);
+                                                            , 25, 135, 84);
+                                            todoViewModel.setCheckItem(todoItem, false);
+                                            todoViewModel.setUncheckItem(todoItem, false);
+                                            Navigation.findNavController(getView()).popBackStack(R.id.todoListFragment, true);
                                             compositeDisposable.dispose();
                                         })
                                 );
@@ -196,6 +196,9 @@ public class TodoEditFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Transition transition = TransitionInflater.from(requireContext())
+                .inflateTransition(R.transition.trainsition_main);
+        setSharedElementEnterTransition(transition);
         fragmentTodoEditBinding = FragmentTodoEditBinding.inflate(inflater, container, false);
         View mView = fragmentTodoEditBinding.getRoot();
         todoViewModel = new ViewModelProvider(this).get(TodoViewModel.class);
@@ -203,6 +206,7 @@ public class TodoEditFragment extends Fragment {
 
         return mView;
     }
+
     private boolean isNullOrEmpty(String s) {
         if (s == null) {
             return true;
@@ -216,7 +220,7 @@ public class TodoEditFragment extends Fragment {
 
     private void showDatePicker(TextInputEditText textDate) {
 
-        if(datePicker == null)
+        if (datePicker == null)
             datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select date").setSelection(MaterialDatePicker.todayInUtcMilliseconds()).build();
 
         datePicker.show(getParentFragmentManager(), "Material_Date_Picker");

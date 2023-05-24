@@ -6,4 +6,5 @@
     <string name="title_activity_tesst">tesstActivity</string>
     <string name="title_activity_frame_jpactivity">FrameJPActivity</string>
     <string name="title_activity_nav">NavActivity</string>
+    <string name="touch_to_add_new_drink">Touch to add new drink</string>
 </resources>

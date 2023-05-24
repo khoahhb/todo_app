@@ -1,6 +1,5 @@
 package com.example.todo_app.views.jetpack
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -261,7 +260,7 @@ fun Tabs(
                         val compositeDisposable = CompositeDisposable()
                         compositeDisposable.add(
                             viewModel
-                                .deleteSelectedTodos()
+                                .deleteCheckedTodos()
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(Action {
@@ -270,6 +269,8 @@ fun Tabs(
                                         "Todos has been deleted successfully!",
                                         Toast.LENGTH_SHORT
                                     ).show()
+                                    viewModel.resetUncheckedList()
+                                    viewModel.resetCheckedList()
                                     compositeDisposable.dispose()
                                 })
                         )
@@ -311,11 +312,12 @@ fun TabContent(
 @Composable
 fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: NavHostController) {
     var todos by remember { mutableStateOf(ArrayList<Todo>()) }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
 
-        LazyColumn {
+        LazyColumn (modifier = Modifier){
             viewModel.getKeyTranfer().observe(owner) {
                 viewModel.getListTodoAll(viewModel.getKeyTranfer().value)
                     .observe(owner) { item: List<Todo> ->
@@ -404,6 +406,7 @@ fun PendingFragment(
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TodoItem(
     viewModel: TodoViewModel,
@@ -412,12 +415,28 @@ fun TodoItem(
     todoItem: Todo
 ) {
     val isChecked = remember { mutableStateOf(false) }
+
+    viewModel.checkedList.observe(owner) {
+        if (it.contains(todoItem)) {
+            isChecked.value = true
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .wrapContentHeight(align = Alignment.CenterVertically),
-        elevation = 8.dp
+        elevation = 8.dp,
+        onClick =
+        {
+            isChecked.value = !isChecked.value
+            if (isChecked.value) {
+                viewModel.setCheckItem(todoItem, true)
+            } else {
+                viewModel.setCheckItem(todoItem, false)
+            }
+        }
     )
     {
         Row(
@@ -435,48 +454,33 @@ fun TodoItem(
                     isChecked.value = it
 
                     if (isChecked.value) {
-                        viewModel.setCheckItem(todoItem,true)
+                        viewModel.setCheckItem(todoItem, true)
                     } else {
-                        viewModel.setCheckItem(todoItem,false)
+                        viewModel.setCheckItem(todoItem, false)
 
                     }
 
                 }
             )
-            if (isChecked.value) {
-                Text(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .fillMaxWidth(fraction = 0.5f),
-                    text = todoItem.title,
-                    style = TextStyle(
-                        textDecoration = TextDecoration.LineThrough
-                    )
-                )
-                Text(
-                    fontSize = 1.sp,
-                    modifier = Modifier
-                        .padding(start = 6.dp)
-                        .fillMaxWidth(fraction = 0.45f), text = todoItem.createdDate,
-                    style = TextStyle(
-                        textDecoration = TextDecoration.LineThrough
-                    )
-                )
-            } else {
-                Text(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .fillMaxWidth(fraction = 0.5f),
-                    text = todoItem.title,
-                )
-                Text(
-                    fontSize = 11.sp,
-                    modifier = Modifier
-                        .padding(start = 6.dp)
-                        .fillMaxWidth(fraction = 0.45f),
-                    text = todoItem.createdDate,
-                )
-            }
+            Text(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .fillMaxWidth(fraction = 0.5f),
+                text = todoItem.title,
+                style = if (isChecked.value) TextStyle(
+                    textDecoration = TextDecoration.LineThrough
+                ) else TextStyle(textDecoration = TextDecoration.None)
+            )
+            Text(
+                fontSize = 11.sp,
+                modifier = Modifier
+                    .padding(start = 6.dp)
+                    .fillMaxWidth(fraction = 0.45f),
+                text = todoItem.createdDate,
+                style = if (isChecked.value) TextStyle(
+                    textDecoration = TextDecoration.LineThrough
+                ) else TextStyle(textDecoration = TextDecoration.None)
+            )
             Spacer(
                 Modifier
                     .weight(1f)
