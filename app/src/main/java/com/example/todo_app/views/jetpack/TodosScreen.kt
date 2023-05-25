@@ -3,6 +3,7 @@ package com.example.todo_app.views.jetpack
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -35,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -67,6 +70,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Action
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Objects
 
@@ -311,23 +315,40 @@ fun TabContent(
 
 @Composable
 fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: NavHostController) {
-    var todos by remember { mutableStateOf(ArrayList<Todo>()) }
+
+    val todoAllList = remember {
+        mutableStateListOf<Todo>()
+    }
+    val todoMainList = remember {
+        mutableStateListOf<Todo>()
+    }
+
+    var numberItemPerPage: Int = remember { 10 }
+    var startIndex: Int = remember { 0 }
+    var endtIndex: Int = remember { startIndex + numberItemPerPage }
+
+    viewModel.getKeyTranfer().observe(owner) {
+        viewModel.listTodoAll
+            .observe(owner) { item ->
+                startIndex = 0
+                endtIndex = 0
+                todoAllList.clear()
+                todoMainList.clear()
+                todoAllList.addAll(item)
+                if (todoAllList.size < 10)
+                    endtIndex = todoAllList.size
+                todoMainList.addAll(todoAllList.slice(startIndex until endtIndex))
+            }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-
-        LazyColumn (modifier = Modifier){
-            viewModel.getKeyTranfer().observe(owner) {
-                viewModel.getListTodoAll(viewModel.getKeyTranfer().value)
-                    .observe(owner) { item: List<Todo> ->
-                        todos = item as ArrayList<Todo>
-                    }
-            }
-            items(count = todos.size, key = {
-                todos[it].id
+        LazyColumn(modifier = Modifier) {
+            items(count = todoMainList.size, key = {
+                todoMainList[it].id
             }, itemContent = { index ->
-                val todo = todos[index]
+                val todo = todoMainList.get(index)
                 TodoItem(
                     viewModel,
                     owner,
@@ -335,6 +356,29 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
                     todo,
                 )
             })
+            item {
+                if (todoAllList.size > todoMainList.size) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                    LaunchedEffect(Unit) {
+                        delay(1000)
+                        var tempList: MutableList<Todo>
+                        startIndex = endtIndex
+                        endtIndex += numberItemPerPage
+                        if (todoAllList.size - 1 < endtIndex)
+                            endtIndex = todoAllList.size
+                        tempList =
+                            todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+                        todoMainList.addAll(tempList)
+                    }
+                }
+            }
         }
     }
 }
@@ -345,22 +389,40 @@ fun CompletedFragment(
     owner: LifecycleOwner,
     navController: NavHostController
 ) {
-    var todos by remember { mutableStateOf(ArrayList<Todo>()) }
+
+    val todoAllList = remember {
+        mutableStateListOf<Todo>()
+    }
+    val todoMainList = remember {
+        mutableStateListOf<Todo>()
+    }
+
+    var numberItemPerPage: Int = remember { 10 }
+    var startIndex: Int = remember { 0 }
+    var endtIndex: Int = remember { startIndex + numberItemPerPage }
+
+    viewModel.getKeyTranfer().observe(owner) {
+        viewModel.getListTodoByStatus("Completed")
+            .observe(owner) { item ->
+                startIndex = 0
+                endtIndex = 0
+                todoAllList.clear()
+                todoMainList.clear()
+                todoAllList.addAll(item)
+                if (todoAllList.size < 10)
+                    endtIndex = todoAllList.size
+                todoMainList.addAll(todoAllList.slice(startIndex until endtIndex))
+            }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-
-        LazyColumn {
-            viewModel.getKeyTranfer().observe(owner) {
-                viewModel.getListTodoByStatus("Completed")
-                    .observe(owner) { item: List<Todo> ->
-                        todos = item as ArrayList<Todo>
-                    }
-            }
-            items(count = todos.size, key = {
-                todos[it].id
+        LazyColumn(modifier = Modifier) {
+            items(count = todoMainList.size, key = {
+                todoMainList[it].id
             }, itemContent = { index ->
-                val todo = todos[index]
+                val todo = todoMainList.get(index)
                 TodoItem(
                     viewModel,
                     owner,
@@ -368,6 +430,29 @@ fun CompletedFragment(
                     todo,
                 )
             })
+            item {
+                if (todoAllList.size > todoMainList.size) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                    LaunchedEffect(Unit) {
+                        delay(1000)
+                        var tempList: MutableList<Todo>
+                        startIndex = endtIndex
+                        endtIndex += numberItemPerPage
+                        if (todoAllList.size - 1 < endtIndex)
+                            endtIndex = todoAllList.size
+                        tempList =
+                            todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+                        todoMainList.addAll(tempList)
+                    }
+                }
+            }
         }
     }
 }
@@ -378,22 +463,40 @@ fun PendingFragment(
     owner: LifecycleOwner,
     navController: NavHostController
 ) {
-    var todos by remember { mutableStateOf(ArrayList<Todo>()) }
+
+    val todoAllList = remember {
+        mutableStateListOf<Todo>()
+    }
+    val todoMainList = remember {
+        mutableStateListOf<Todo>()
+    }
+
+    var numberItemPerPage: Int = remember { 10 }
+    var startIndex: Int = remember { 0 }
+    var endtIndex: Int = remember { startIndex + numberItemPerPage }
+
+    viewModel.getKeyTranfer().observe(owner) {
+        viewModel.getListTodoByStatus("Pending")
+            .observe(owner) { item ->
+                startIndex = 0
+                endtIndex = 0
+                todoAllList.clear()
+                todoMainList.clear()
+                todoAllList.addAll(item)
+                if (todoAllList.size < 10)
+                    endtIndex = todoAllList.size
+                todoMainList.addAll(todoAllList.slice(startIndex until endtIndex))
+            }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-
-        LazyColumn {
-            viewModel.getKeyTranfer().observe(owner) {
-                viewModel.getListTodoByStatus("Pending")
-                    .observe(owner) { item: List<Todo> ->
-                        todos = item as ArrayList<Todo>
-                    }
-            }
-            items(count = todos.size, key = {
-                todos[it].id
+        LazyColumn(modifier = Modifier) {
+            items(count = todoMainList.size, key = {
+                todoMainList[it].id
             }, itemContent = { index ->
-                val todo = todos[index]
+                val todo = todoMainList.get(index)
                 TodoItem(
                     viewModel,
                     owner,
@@ -401,11 +504,32 @@ fun PendingFragment(
                     todo,
                 )
             })
+            item {
+                if (todoAllList.size > todoMainList.size) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                    LaunchedEffect(Unit) {
+                        delay(1000)
+                        var tempList: MutableList<Todo>
+                        startIndex = endtIndex
+                        endtIndex += numberItemPerPage
+                        if (todoAllList.size - 1 < endtIndex)
+                            endtIndex = todoAllList.size
+                        tempList =
+                            todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+                        todoMainList.addAll(tempList)
+                    }
+                }
+            }
         }
     }
 }
-
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TodoItem(
@@ -423,6 +547,7 @@ fun TodoItem(
     }
 
     Card(
+
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)

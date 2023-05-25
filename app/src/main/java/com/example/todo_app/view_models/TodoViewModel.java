@@ -11,6 +11,7 @@ import com.example.todo_app.repositories.TodoRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.Completable;
 
@@ -45,8 +46,8 @@ public class TodoViewModel extends AndroidViewModel {
         return uncheckedList;
     }
 
-    public LiveData<List<Todo>> getListTodoAll(String keyword) {
-        mTodos = mRepository.getListTodoAll(keyword);
+    public LiveData<List<Todo>> getListTodoAll() {
+        mTodos = mRepository.getListTodoAll(keyTranfer.getValue());
         return mTodos;
     }
 
@@ -69,7 +70,7 @@ public class TodoViewModel extends AndroidViewModel {
 
     public Completable deleteCheckedTodos() {
         List<Integer> ids = new ArrayList<>();
-        for (Todo e : checkedList.getValue()) {
+        for (Todo e : Objects.requireNonNull(checkedList.getValue())) {
             ids.add(e.getId());
         }
         return mRepository.deleteCheckedTodos(ids);

@@ -89,7 +89,7 @@ public class TodoAllFragment extends Fragment {
         fragmentTodoAllBinding.rclvTodoAll.setAdapter(todoAdapter);
 
         todoViewModel.getKeyTranfer().observe(requireActivity(), s ->
-                todoViewModel.getListTodoAll(todoViewModel.getKeyTranfer().getValue())
+                todoViewModel.getListTodoAll()
                         .observe(requireActivity(), items -> {
                     todoAllList = items;
                     currentPage = 0;

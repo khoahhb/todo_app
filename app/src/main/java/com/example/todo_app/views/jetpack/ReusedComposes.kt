@@ -25,14 +25,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.todo_app.models.Todo
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import java.time.LocalDate
+
 typealias ComposableFun = @Composable () -> Unit
 
 class TabItem(var title: String, var screen: ComposableFun)
+
+data class ScreenState(
+    val isLoading: Boolean = false,
+    val items: List<Todo> = emptyList(),
+    val error: String? = null,
+    val endReached: Boolean = false,
+    val page: Int = 0
+)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
