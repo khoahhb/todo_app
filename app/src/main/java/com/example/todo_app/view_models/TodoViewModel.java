@@ -24,6 +24,35 @@ public class TodoViewModel extends AndroidViewModel {
     public static final MutableLiveData<List<Todo>> checkedList = new MutableLiveData<>();
     public static final MutableLiveData<List<Todo>> uncheckedList = new MutableLiveData<>();
 
+    public static  int endIndexAll = 20;
+
+    public static  int endIndexPending = 20;
+
+    public static  int endIndexCompleted = 20;
+
+    public int getEndIndexAll(){
+        return  endIndexAll;
+    }
+
+    public void setEndIndexAll(int value){
+        endIndexAll = value;
+    }
+
+    public int getEndIndexPending(){
+        return  endIndexPending;
+    }
+
+    public void setEndIndexPending(int value){
+        endIndexPending = value;
+    }
+
+    public int getEndIndexCompleted(){
+        return  endIndexCompleted;
+    }
+
+    public void setEndIndexCompleted(int value){
+        endIndexCompleted = value;
+    }
     public MutableLiveData<String> keyTranfer = new MutableLiveData<>();
 
     public TodoViewModel(Application application) {
@@ -70,8 +99,16 @@ public class TodoViewModel extends AndroidViewModel {
 
     public Completable deleteCheckedTodos() {
         List<Integer> ids = new ArrayList<>();
+
         for (Todo e : Objects.requireNonNull(checkedList.getValue())) {
             ids.add(e.getId());
+            if (e.getStatus().equals("Completd")){
+                if(endIndexCompleted > 0) endIndexCompleted--;
+            }else{
+                if(endIndexPending > 0) endIndexPending--;
+            }
+            if(endIndexAll > 0) endIndexAll--;
+
         }
         return mRepository.deleteCheckedTodos(ids);
     }
