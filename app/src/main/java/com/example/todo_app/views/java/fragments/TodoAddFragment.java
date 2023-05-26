@@ -129,7 +129,7 @@ public class TodoAddFragment extends Fragment {
             public void onClick(View view) {
                 try {
 
-                    for (int i = 1; i < 30; i++) {
+                    for (int i = 1; i < 300; i++) {
                         Todo todoTemp = new Todo("Item " + i, "desc", "Pending",
                                 "2023-14-11", "2023-14-11");
                         testFunct(todoTemp);

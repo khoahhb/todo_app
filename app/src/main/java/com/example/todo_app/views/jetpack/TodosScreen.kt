@@ -335,9 +335,10 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
                 todoAllList.clear()
                 todoMainList.clear()
                 todoAllList.addAll(item)
-                if (todoAllList.size < 10)
-                    endtIndex = todoAllList.size
-                todoMainList.addAll(todoAllList.slice(startIndex until endtIndex))
+//                if (todoAllList.size < 10)
+//                    endtIndex = todoAllList.size
+//                todoMainList.addAll(todoAllList.slice(startIndex until endtIndex))
+                todoMainList.addAll(todoAllList)
             }
     }
 
@@ -356,29 +357,29 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
                     todo,
                 )
             })
-            item {
-                if (todoAllList.size > todoMainList.size) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                    LaunchedEffect(Unit) {
-                        delay(1000)
-                        var tempList: MutableList<Todo>
-                        startIndex = endtIndex
-                        endtIndex += numberItemPerPage
-                        if (todoAllList.size - 1 < endtIndex)
-                            endtIndex = todoAllList.size
-                        tempList =
-                            todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
-                        todoMainList.addAll(tempList)
-                    }
-                }
-            }
+//            item {
+//                if (todoAllList.size > todoMainList.size) {
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(8.dp),
+//                        horizontalArrangement = Arrangement.Center
+//                    ) {
+//                        CircularProgressIndicator()
+//                    }
+//                    LaunchedEffect(Unit) {
+//                        delay(1000)
+//                        var tempList: MutableList<Todo>
+//                        startIndex = endtIndex
+//                        endtIndex += numberItemPerPage
+//                        if (todoAllList.size - 1 < endtIndex)
+//                            endtIndex = todoAllList.size
+//                        tempList =
+//                            todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+//                        todoMainList.addAll(tempList)
+//                    }
+//                }
+//            }
         }
     }
 }

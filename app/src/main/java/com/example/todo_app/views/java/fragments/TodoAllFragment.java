@@ -2,6 +2,7 @@ package com.example.todo_app.views.java.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,7 +75,7 @@ public class TodoAllFragment extends Fragment {
                 , DividerItemDecoration.VERTICAL);
         fragmentTodoAllBinding.rclvTodoAll.addItemDecoration(dividerItemDecoration);
 
-        todoAdapter = new TodoAdapter(todoAllList, new TodoAdapter.TodoClickListener() {
+        todoAdapter = new TodoAdapter(todoMainList, new TodoAdapter.TodoClickListener() {
             @Override
             public void onGoDetailItem(Todo todo, CardView cardView) {
                 FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
@@ -126,13 +127,15 @@ public class TodoAllFragment extends Fragment {
             startIndex = 0;
             endIndex = 10;
             if (todoAllList.size() > 10) {
-                todoMainList = todoAllList.subList(startIndex, endIndex);
+
+                todoMainList = new ArrayList<>(todoAllList.subList(startIndex, endIndex));
                 startIndex = endIndex;
-                if ((endIndex + 10) < todoAllList.size()) {
-                    endIndex += 10;
+                endIndex += 10;
+                if (todoAllList.size() - 1 < endIndex) {
+                    endIndex = todoAllList.size() - 1;
                 }
             } else {
-                todoMainList = todoAllList;
+                todoMainList = new ArrayList<>(todoAllList);
             }
             todoAdapter.setData(todoMainList);
             if (currentPage < totalPage) {
@@ -146,25 +149,26 @@ public class TodoAllFragment extends Fragment {
 
     private void loadNextPage() {
         new Handler().postDelayed(() -> {
-            List<Todo> list = new ArrayList<>();
-            if (todoAllList.size() > 10) {
-                list = todoAllList.subList(startIndex, endIndex);
 
+            List<Todo> list = new ArrayList<>();
+
+            if(todoAllList.size() > todoMainList.size()){
+                list = new ArrayList<>(todoAllList.subList(startIndex, endIndex));
                 startIndex = endIndex;
-                if ((endIndex + 10) < todoAllList.size()) {
-                    endIndex += 10;
-                } else {
-                    endIndex = todoAllList.size();
+                endIndex += 10;
+                if (todoAllList.size() - 1 < endIndex) {
+                    endIndex = todoAllList.size() - 1;
                 }
-            }
-            todoAdapter.removeFooterLoading();
-            todoMainList.addAll(list);
-            todoAdapter.setData(todoMainList);
-            isLoading = false;
-            if (currentPage < totalPage) {
-                todoAdapter.addFooterLoading();
-            } else {
-                isLastPage = true;
+
+                todoAdapter.removeFooterLoading();
+                todoMainList.addAll(list);
+                todoAdapter.setData(todoMainList);
+                isLoading = false;
+                if (currentPage < totalPage) {
+                    todoAdapter.addFooterLoading();
+                } else {
+                    isLastPage = true;
+                }
             }
         }, 1000);
     }
