@@ -102,13 +102,12 @@ public class TodoViewModel extends AndroidViewModel {
 
         for (Todo e : Objects.requireNonNull(checkedList.getValue())) {
             ids.add(e.getId());
-            if (e.getStatus().equals("Completd")){
-                if(endIndexCompleted > 0) endIndexCompleted--;
-            }else{
-                if(endIndexPending > 0) endIndexPending--;
+            if (e.getStatus().equals("Completd") && e.getId() <endIndexCompleted && endIndexCompleted > 0){
+                endIndexCompleted--;
+            } else if (e.getStatus().equals("Pending") && e.getId() < endIndexPending && endIndexPending > 0) {
+                endIndexPending--;
             }
             if(endIndexAll > 0) endIndexAll--;
-
         }
         return mRepository.deleteCheckedTodos(ids);
     }
