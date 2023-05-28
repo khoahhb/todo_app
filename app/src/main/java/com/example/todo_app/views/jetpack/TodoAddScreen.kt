@@ -4,9 +4,11 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
@@ -50,7 +52,7 @@ fun TodoAddScreen(
     owner: LifecycleOwner,
     navController: NavHostController
 ) {
-    var snackbarColor: Color = color_success
+
     var statusText: String by remember { mutableStateOf("Pending") }
     var tileText: String by remember { mutableStateOf("") }
     var descText: String by remember { mutableStateOf("") }
@@ -133,12 +135,117 @@ fun TodoAddScreen(
                                         )
                                     }
                                 }
-
                                 compositeDisposable.dispose()
                             })
                     )
+                })
+            {
+                Text(
+                    text = "Add todo",
+                    style = MaterialTheme.typography.h6,
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
+@Composable
+fun TodoAddScreenBottomSheet(
+    viewModel: TodoViewModel,
+    owner: LifecycleOwner,
+) {
 
+    var statusText: String by remember { mutableStateOf("Pending") }
+    var tileText: String by remember { mutableStateOf("") }
+    var descText: String by remember { mutableStateOf("") }
+    var createdDateText: String by remember { mutableStateOf("") }
+    var completedDateText: String by remember { mutableStateOf("") }
+
+    val mContext = LocalContext.current
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
+    Scaffold(modifier = Modifier, scaffoldState = scaffoldState) {
+        it
+        Column(
+            modifier = Modifier
+                .wrapContentHeight()
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "Add todo screen",
+                color = colorResource(R.color.md_theme_light_primary),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
+            )
+
+            CustomDropdown("Status", statusText, { text ->
+                statusText = text
+            }, statusText)
+
+            CustomTextField("Tile", tileText) { text ->
+                tileText = text
+            }
+
+            CustomTextField("Description", descText) { text ->
+                descText = text
+            }
+
+            CustomDatePicker("Created date", createdDateText) { date ->
+                createdDateText = date.toString()
+            }
+
+            CustomDatePicker("Completed date", completedDateText) { date ->
+                completedDateText = date.toString()
+            }
+
+            Button(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(62.dp)
+                    .padding(top = 16.dp),
+                shape = RoundedCornerShape(24.dp),
+                onClick = {
+
+                    var todo: Todo =
+                        Todo(tileText, descText, statusText, createdDateText, completedDateText)
+
+                    val compositeDisposable = CompositeDisposable()
+                    compositeDisposable.add(
+                        viewModel
+                            .insertTodo(todo)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(Action {
+                                try {
+                                    coroutineScope.launch {
+                                        Toast.makeText(
+                                            mContext,
+                                            "Data has been saved successfully!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        statusText = ""
+                                        tileText = ""
+                                        descText = ""
+                                        createdDateText = ""
+                                        completedDateText = ""
+                                        viewModel.scope.launch { viewModel.modalAddState.hide() }
+                                    }
+                                } catch (e: Exception) {
+                                    coroutineScope.launch {
+                                        scaffoldState.snackbarHostState.showSnackbar(
+                                            message = "Data added fail!",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
+                                }
+                                compositeDisposable.dispose()
+                            })
+                    )
                 })
             {
                 Text(

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.example.todo_app.models.Todo
 import com.example.todo_app.views.java.activities.FrameActivity
 import com.example.todo_app.views.jetpack.NavActivity
+import com.example.todo_app.views.jetpack.TodoMainBottomSheetActivity
 
 class SwitchFrameworkActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +39,7 @@ class SwitchFrameworkActivity : ComponentActivity() {
 
 @Composable
 fun SwitchScreen() {
+
     val mContext = LocalContext.current
 
     Scaffold() {
@@ -57,7 +59,7 @@ fun SwitchScreen() {
             )
             Button(
                 modifier = Modifier
-                    .width(200.dp)
+                    .width(250.dp)
                     .height(76.dp)
                     .padding(bottom = 24.dp),
                 shape = RoundedCornerShape(24.dp),
@@ -76,7 +78,7 @@ fun SwitchScreen() {
             }
             Button(
                 modifier = Modifier
-                    .width(200.dp)
+                    .width(250.dp)
                     .height(76.dp)
                     .padding(bottom = 24.dp),
                 shape = RoundedCornerShape(24.dp),
@@ -94,27 +96,22 @@ fun SwitchScreen() {
             }
             Button(
                 modifier = Modifier
-                    .width(200.dp)
+                    .width(250.dp)
                     .height(76.dp)
                     .padding(bottom = 24.dp),
                 shape = RoundedCornerShape(24.dp),
                 onClick = {
-                    var todo1: Todo = Todo("tile", "desc", "status", "created", "completed")
-                    var todo2: Todo = Todo("tile", "desc", "status", "created", "completed")
-
-                    if(todo1.equals(todo2))
-                        Toast.makeText(mContext, "Vo", Toast.LENGTH_SHORT).show()
+                    mContext.startActivity(Intent(mContext, TodoMainBottomSheetActivity::class.java))
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colorScheme.primary)
             )
             {
                 Text(
-                    text = "Test function",
+                    text = "Jetpack - bottom sheet",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
     }
-
 }

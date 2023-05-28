@@ -1,33 +1,19 @@
 package com.example.todo_app.views.jetpack
 
+import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.LeadingIconTab
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScrollableTabRow
-import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -35,7 +21,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,7 +41,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavHostController
+import androidx.lifecycle.ViewModelProvider
 import com.example.todo_app.R
 import com.example.todo_app.models.Todo
 import com.example.todo_app.view_models.TodoViewModel
@@ -65,7 +50,6 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
-import com.squareup.moshi.Moshi
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Action
@@ -74,13 +58,46 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Objects
 
+class TodoMainBottomSheetActivity : ComponentActivity() {
+    @OptIn(ExperimentalAnimationApi::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
+
+        val viewModel: TodoViewModel =
+            ViewModelProvider(this)[TodoViewModel::class.java]
+
+        setContent {
+            TodosScreenBottomSheet(viewModel, this)
+        }
+
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
-fun TodosScreen(
+fun TodosScreenBottomSheet(
     viewModel: TodoViewModel,
     owner: LifecycleOwner,
-    navController: NavHostController
 ) {
+
+    val scope = rememberCoroutineScope()
+
+    val bottomSheetStateAdd = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden, animationSpec = tween(
+            durationMillis = 500,
+            delayMillis = 10,
+            easing = FastOutLinearInEasing,
+        )
+    )
+
+    val bottomSheetStateEdit = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden, animationSpec = tween(
+            durationMillis = 500,
+            delayMillis = 10,
+            easing = FastOutLinearInEasing,
+        )
+    )
 
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
@@ -90,13 +107,23 @@ fun TodosScreen(
     val tabs: MutableList<TabItem> = ArrayList<TabItem>().toMutableList()
 
     tabs += TabItem("All") {
-        AllFragment(viewModel, owner, navController)
+        AllFragmentBS(viewModel, owner)
     }
     tabs += TabItem("Pending") {
-        PendingFragment(viewModel, owner, navController)
+        PendingFragmentBS(viewModel, owner)
     }
     tabs += TabItem("Completed") {
-        CompletedFragment(viewModel, owner, navController)
+        CompletedFragmentBS(viewModel, owner)
+    }
+
+    viewModel.scope = scope
+    viewModel.modalAddState = bottomSheetStateAdd
+    viewModel.modalEditState = bottomSheetStateEdit
+
+    viewModel.todoEditItem.observe(owner) { item ->
+        if (item.id > 0) {
+            viewModel.scope.launch { viewModel.modalEditState.show() }
+        }
     }
 
     Scaffold(floatingActionButton = {
@@ -104,7 +131,9 @@ fun TodosScreen(
             backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
             onClick =
             {
-                navController.navigate("add_todo_page")
+                scope.launch {
+                    bottomSheetStateAdd.show()
+                }
             })
         {
             Icon(Icons.Filled.Add, "")
@@ -131,8 +160,10 @@ fun TodosScreen(
                         )
                 },
                 active = active,
-                onActiveChange = { active = it },
-                placeholder = { Text("Search todo") },
+                onActiveChange = {
+                    active = it
+                },
+                placeholder = { androidx.compose.material3.Text("Search todo") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (active)
@@ -157,7 +188,6 @@ fun TodosScreen(
                 }
             ) {
                 if (historySearchItem.isNotEmpty()) {
-
                     historySearchItem.forEach {
                         Row(
                             modifier = Modifier
@@ -184,28 +214,35 @@ fun TodosScreen(
                                 tint = Color.Black,
                                 modifier = Modifier.padding(8.dp)
                             )
-                            Text(text = it)
+                            androidx.compose.material3.Text(text = it)
                         }
                     }
                 }
-
             }
             Spacer(modifier = Modifier.size(16.dp))
-            Tabs(tabs, pagerState, viewModel, navController)
-            TabContent(tabs = tabs, pagerState = pagerState, viewModel, navController)
+            TabsBS(tabs, pagerState, viewModel)
+            TabContentBS(tabs = tabs, pagerState = pagerState)
         }
+        CustomBottomSheet(
+            bottomSheetState = bottomSheetStateAdd,
+            sheetContent = { TodoAddScreenBottomSheet(viewModel, owner) })
+        CustomBottomSheet(
+            bottomSheetState = bottomSheetStateEdit,
+            sheetContent = { TodoEditScreenBottomSheet(viewModel, owner) })
     }
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun Tabs(
+fun TabsBS(
     tabs: List<TabItem>,
     pagerState: PagerState,
     viewModel: TodoViewModel,
-    navController: NavHostController
 ) {
-    var dialogOpen by remember { mutableStateOf(false) }
+
+    var dialogOpen by remember {
+        mutableStateOf(false)
+    }
     val scope = rememberCoroutineScope()
     val mContext = LocalContext.current
 
@@ -216,8 +253,7 @@ fun Tabs(
             selectedTabIndex = pagerState.currentPage,
             backgroundColor = Color.White,
             contentColor = colorResource(id = R.color.md_theme_dark_onPrimary),
-            indicator =
-            { tabPositions ->
+            indicator = { tabPositions ->
                 TabRowDefaults.Indicator(
                     modifier = Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
                     height = 3.dp,
@@ -226,21 +262,20 @@ fun Tabs(
             },)
         {
             tabs.forEachIndexed { index, tabItem ->
-
                 LeadingIconTab(
                     selected = pagerState.currentPage == index,
-                    onClick = {
+                    onClick =
+                    {
                         scope.launch {
                             pagerState.animateScrollToPage(index)
                         }
                     },
-                    text = { Text(tabItem.title) },
+                    text = { androidx.compose.material3.Text(tabItem.title) },
                     icon = {},
                     selectedContentColor = Color.Blue,
                     unselectedContentColor = Color.White,
                     enabled = true,
                 )
-
             }
         }
         if (dialogOpen) {
@@ -248,8 +283,8 @@ fun Tabs(
                 "Confirmation dialog",
                 "Do you really want to delete these todo?",
                 {
-
-                    var temp: MutableList<Todo> = TodoViewModel.checkedList.value as MutableList<Todo>
+                    var temp: MutableList<Todo> =
+                        TodoViewModel.checkedList.value as MutableList<Todo>
 
                     if (temp.size <= 0)
                         Toast.makeText(
@@ -284,11 +319,13 @@ fun Tabs(
         }
         Button(
             colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.md_theme_light_error)),
-            onClick = {
+            onClick =
+            {
                 dialogOpen = true
-            }, shape = RoundedCornerShape(8.dp))
+            },
+            shape = RoundedCornerShape(8.dp))
         {
-            Text(
+            androidx.compose.material3.Text(
                 text = "Clear",
                 color = colorResource(R.color.white),
             )
@@ -298,19 +335,21 @@ fun Tabs(
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun TabContent(
+fun TabContentBS(
     tabs: List<TabItem>,
     pagerState: PagerState,
-    viewModel: TodoViewModel,
-    navController: NavHostController
 ) {
-    HorizontalPager(count = tabs.size, state = pagerState) { page ->
+    HorizontalPager(count = tabs.size, state = pagerState)
+    { page ->
         tabs[page].screen()
     }
 }
 
 @Composable
-fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: NavHostController) {
+fun AllFragmentBS(
+    viewModel: TodoViewModel,
+    owner: LifecycleOwner,
+) {
 
     val todoAllList = remember {
         mutableStateListOf<Todo>()
@@ -322,7 +361,7 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
 
     var numberItemPerPage: Int = remember { 20 }
     var startIndex: Int = remember { 0 }
-    var endtIndex: Int = remember { viewModel.endIndexAll}
+    var endtIndex: Int = remember { viewModel.endIndexAll }
 
     viewModel.getKeyTranfer().observe(owner) {
         viewModel.listTodoAll
@@ -338,21 +377,25 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
+        modifier = Modifier.fillMaxSize())
+    {
         LazyColumn(modifier = Modifier)
         {
+
             items(
                 count = todoMainList.size,
-                key = {
-                    todoMainList[it].id },
-                itemContent = { index ->
-                    val todo = todoMainList.get(index)
-                    TodoItem(
-                        viewModel,
-                        owner,
-                        navController,
-                        todo)
+                key =
+                {
+                    todoMainList[it].id
+                },
+                itemContent =
+                {
+                        index ->
+                val todo = todoMainList.get(index)
+                TodoItemBS(
+                    viewModel,
+                    owner,
+                    todo,)
                 })
 
             if (todoAllList.size > todoMainList.size) {
@@ -361,8 +404,8 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
+                        horizontalArrangement = Arrangement.Center)
+                    {
                         CircularProgressIndicator()
                     }
                     LaunchedEffect(Unit) {
@@ -379,16 +422,14 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
                     }
                 }
             }
-
         }
     }
 }
 
 @Composable
-fun PendingFragment(
+fun PendingFragmentBS(
     viewModel: TodoViewModel,
     owner: LifecycleOwner,
-    navController: NavHostController
 ) {
 
     val todoAllList = remember {
@@ -417,22 +458,25 @@ fun PendingFragment(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        LazyColumn(modifier = Modifier) {
+        modifier = Modifier.fillMaxSize())
+    {
+        LazyColumn(modifier = Modifier)
+        {
+
             items(
                 count = todoMainList.size,
-                key = {
+                key =
+                {
                     todoMainList[it].id
-                      },
-                itemContent = { index ->
+                },
+                itemContent =
+                {
+                        index ->
                     val todo = todoMainList.get(index)
-                    TodoItem(
+                    TodoItemBS(
                         viewModel,
                         owner,
-                        navController,
-                        todo,
-                    )
+                        todo,)
                 })
 
             if (todoAllList.size > todoMainList.size) {
@@ -464,10 +508,9 @@ fun PendingFragment(
 }
 
 @Composable
-fun CompletedFragment(
+fun CompletedFragmentBS(
     viewModel: TodoViewModel,
     owner: LifecycleOwner,
-    navController: NavHostController
 ) {
 
     val todoAllList = remember {
@@ -496,23 +539,26 @@ fun CompletedFragment(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        LazyColumn(modifier = Modifier) {
+        modifier = Modifier.fillMaxSize())
+    {
+        LazyColumn(modifier = Modifier)
+        {
+
             items(
                 count = todoMainList.size,
-                key = {
+                key =
+                {
                     todoMainList[it].id
-                      },
-                itemContent = { index ->
+                },
+                itemContent =
+                {
+                        index ->
                     val todo = todoMainList.get(index)
-                    TodoItem(
+                    TodoItemBS(
                         viewModel,
                         owner,
-                        navController,
-                        todo,
-                    )
-            })
+                        todo,)
+                })
 
             if (todoAllList.size > todoMainList.size) {
                 item {
@@ -520,8 +566,8 @@ fun CompletedFragment(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
+                        horizontalArrangement = Arrangement.Center)
+                    {
                         CircularProgressIndicator()
                     }
                     LaunchedEffect(Unit) {
@@ -545,12 +591,12 @@ fun CompletedFragment(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TodoItem(
+fun TodoItemBS(
     viewModel: TodoViewModel,
     owner: LifecycleOwner,
-    navController: NavHostController,
-    todoItem: Todo
+    todoItem: Todo,
 ) {
+
     val isChecked = remember { mutableStateOf(false) }
 
     viewModel.checkedList.observe(owner) {
@@ -597,29 +643,31 @@ fun TodoItem(
                     }
                 }
             )
-            Text(
+            androidx.compose.material3.Text(
                 modifier = Modifier
                     .padding(start = 16.dp)
                     .fillMaxWidth(fraction = 0.5f),
                 text = todoItem.title,
-                style = if (isChecked.value) TextStyle(
-                    textDecoration = TextDecoration.LineThrough
-                ) else TextStyle(textDecoration = TextDecoration.None)
+                style =
+                if (isChecked.value)
+                    TextStyle(textDecoration = TextDecoration.LineThrough
+                ) else
+                    TextStyle(textDecoration = TextDecoration.None)
             )
-            Text(
+            androidx.compose.material3.Text(
                 fontSize = 11.sp,
                 modifier = Modifier
                     .padding(start = 6.dp)
                     .fillMaxWidth(fraction = 0.45f),
                 text = todoItem.createdDate,
-                style = if (isChecked.value) TextStyle(
-                    textDecoration = TextDecoration.LineThrough
-                ) else TextStyle(textDecoration = TextDecoration.None)
+                style =
+                if (isChecked.value)
+                    TextStyle(textDecoration = TextDecoration.LineThrough
+                ) else
+                    TextStyle(textDecoration = TextDecoration.None)
             )
             Spacer(
-                Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
+                Modifier.weight(1f).fillMaxHeight()
             )
             Image(
                 painter = painterResource(id = R.drawable.ic_detail),
@@ -628,14 +676,7 @@ fun TodoItem(
                     .padding(end = 8.dp)
                     .clickable
                     {
-                        val moshi = Moshi
-                            .Builder()
-                            .build()
-                        val jsonAdapter = moshi
-                            .adapter(Todo::class.java)
-                            .lenient()
-                        val todoItemJson = jsonAdapter.toJson(todoItem)
-                        navController.navigate("edit_todo_page/" + todoItemJson)
+                        viewModel.todoEditItem.postValue(todoItem)
                     }
                     .size(32.dp)
                     .fillMaxWidth(fraction = 0.2f),
@@ -643,4 +684,3 @@ fun TodoItem(
         }
     }
 }
-

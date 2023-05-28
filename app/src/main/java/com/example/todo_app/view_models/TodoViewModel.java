@@ -2,6 +2,7 @@ package com.example.todo_app.view_models;
 
 import android.app.Application;
 
+import androidx.compose.material.ModalBottomSheetState;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -14,46 +15,22 @@ import java.util.List;
 import java.util.Objects;
 
 import io.reactivex.Completable;
+import kotlinx.coroutines.CoroutineScope;
 
 public class TodoViewModel extends AndroidViewModel {
 
     private final TodoRepository mRepository;
-
     private LiveData<List<Todo>> mTodos;
-
+    public MutableLiveData<String> keyTranfer = new MutableLiveData<>();
     public static final MutableLiveData<List<Todo>> checkedList = new MutableLiveData<>();
     public static final MutableLiveData<List<Todo>> uncheckedList = new MutableLiveData<>();
-
-    public static  int endIndexAll = 20;
-
-    public static  int endIndexPending = 20;
-
-    public static  int endIndexCompleted = 20;
-
-    public int getEndIndexAll(){
-        return  endIndexAll;
-    }
-
-    public void setEndIndexAll(int value){
-        endIndexAll = value;
-    }
-
-    public int getEndIndexPending(){
-        return  endIndexPending;
-    }
-
-    public void setEndIndexPending(int value){
-        endIndexPending = value;
-    }
-
-    public int getEndIndexCompleted(){
-        return  endIndexCompleted;
-    }
-
-    public void setEndIndexCompleted(int value){
-        endIndexCompleted = value;
-    }
-    public MutableLiveData<String> keyTranfer = new MutableLiveData<>();
+    public static CoroutineScope scope = null;
+    public static ModalBottomSheetState modalAddState = null;
+    public static ModalBottomSheetState modalEditState = null;
+    public static MutableLiveData<Todo> todoEditItem = new MutableLiveData<>();
+    public static int endIndexAll = 20;
+    public static int endIndexPending = 20;
+    public static int endIndexCompleted = 20;
 
     public TodoViewModel(Application application) {
         super(application);
@@ -61,6 +38,7 @@ public class TodoViewModel extends AndroidViewModel {
         keyTranfer.postValue("");
         checkedList.postValue(new ArrayList<>());
         uncheckedList.postValue(new ArrayList<>());
+        todoEditItem.postValue(new Todo());
     }
 
     public MutableLiveData<String> getKeyTranfer() {
@@ -73,6 +51,58 @@ public class TodoViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<Todo>> getUncheckedList() {
         return uncheckedList;
+    }
+
+    public CoroutineScope getScope() {
+        return scope;
+    }
+
+    public ModalBottomSheetState getModalAddState() {
+        return modalAddState;
+    }
+
+    public ModalBottomSheetState getModalEditState() {
+        return modalEditState;
+    }
+
+    public void setScope(CoroutineScope scope1) {
+        scope = scope1;
+    }
+
+    public void setModalAddState(ModalBottomSheetState state) {
+        modalAddState = state;
+    }
+
+    public void setModalEditState(ModalBottomSheetState state) {
+        modalEditState = state;
+    }
+
+    public MutableLiveData<Todo> getTodoEditItem() {
+        return todoEditItem;
+    }
+
+    public int getEndIndexAll() {
+        return endIndexAll;
+    }
+
+    public void setEndIndexAll(int value) {
+        endIndexAll = value;
+    }
+
+    public int getEndIndexPending() {
+        return endIndexPending;
+    }
+
+    public void setEndIndexPending(int value) {
+        endIndexPending = value;
+    }
+
+    public int getEndIndexCompleted() {
+        return endIndexCompleted;
+    }
+
+    public void setEndIndexCompleted(int value) {
+        endIndexCompleted = value;
     }
 
     public LiveData<List<Todo>> getListTodoAll() {
@@ -102,12 +132,12 @@ public class TodoViewModel extends AndroidViewModel {
 
         for (Todo e : Objects.requireNonNull(checkedList.getValue())) {
             ids.add(e.getId());
-            if (e.getStatus().equals("Completd") && e.getId() <endIndexCompleted && endIndexCompleted > 0){
+            if (e.getStatus().equals("Completd") && e.getId() < endIndexCompleted && endIndexCompleted > 0) {
                 endIndexCompleted--;
             } else if (e.getStatus().equals("Pending") && e.getId() < endIndexPending && endIndexPending > 0) {
                 endIndexPending--;
             }
-            if(endIndexAll > 0) endIndexAll--;
+            if (endIndexAll > 0) endIndexAll--;
         }
         return mRepository.deleteCheckedTodos(ids);
     }
@@ -120,8 +150,8 @@ public class TodoViewModel extends AndroidViewModel {
                 item.add(todoT);
             }
         } else {
-            if(item.removeIf(a -> a.equals(todoT))){
-                setUncheckItem(todoT,true);
+            if (item.removeIf(a -> a.equals(todoT))) {
+                setUncheckItem(todoT, true);
             }
         }
         checkedList.postValue(item);
@@ -140,11 +170,12 @@ public class TodoViewModel extends AndroidViewModel {
         uncheckedList.postValue(item);
     }
 
-    public void resetCheckedList(){
+    public void resetCheckedList() {
         List<Todo> item = new ArrayList<>();
         checkedList.postValue(item);
     }
-    public void resetUncheckedList(){
+
+    public void resetUncheckedList() {
         List<Todo> item = new ArrayList<>();
         uncheckedList.postValue(item);
     }

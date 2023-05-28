@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -54,6 +55,7 @@ fun TodoEditScreen(
     todo: Todo,
     navController: NavHostController
 ) {
+
     var statusText: String by remember { mutableStateOf(todo.status) }
     var tileText: String by remember { mutableStateOf(todo.title) }
     var descText: String by remember { mutableStateOf(todo.description) }
@@ -77,7 +79,6 @@ fun TodoEditScreen(
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(bottom = 32.dp),
             )
-
             CustomDropdown("Status", statusText, { text ->
                 statusText = text
             }, statusText)
@@ -97,7 +98,6 @@ fun TodoEditScreen(
             CustomDatePicker("Completed date", completedDateText) { date ->
                 completedDateText = date.toString()
             }
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -186,12 +186,9 @@ fun TodoEditScreen(
                                             )
                                         }
                                     }
-
                                     compositeDisposable.dispose()
                                 })
                         )
-
-
                     })
                 {
                     Text(
@@ -201,7 +198,180 @@ fun TodoEditScreen(
                     )
                 }
             }
+        }
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
+@Composable
+fun TodoEditScreenBottomSheet(
+    viewModel: TodoViewModel,
+    owner: LifecycleOwner,
+) {
+    val todo = remember { mutableStateOf(Todo()) }
+    var statusText: String by remember { mutableStateOf("Pending") }
+    var tileText: String by remember { mutableStateOf("") }
+    var descText: String by remember { mutableStateOf("") }
+    var createdDateText: String by remember { mutableStateOf("") }
+    var completedDateText: String by remember { mutableStateOf("") }
+
+    val mContext = LocalContext.current
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
+    viewModel.todoEditItem.observe(owner) { item ->
+        if (item.id > 0) {
+            todo.value = item
+            viewModel.scope.launch { viewModel.modalEditState.show() }
+        }
+    }
+
+    if (todo.value.id > 0) {
+        statusText = todo.value.status
+        tileText = todo.value.title
+        descText = todo.value.description
+        createdDateText = todo.value.createdDate
+        completedDateText = todo.value.completedDate
+    }
+
+    Scaffold(modifier = Modifier, scaffoldState = scaffoldState) {
+        it
+        Column(
+            modifier = Modifier
+                .wrapContentHeight()
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "Edit todo screen",
+                color = colorResource(R.color.md_theme_light_primary),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
+            )
+
+            CustomDropdown("Status", statusText, { text ->
+                statusText = text
+            }, statusText)
+
+            CustomTextField("Tile", tileText) { text ->
+                tileText = text
+            }
+
+            CustomTextField("Description", descText) { text ->
+                descText = text
+            }
+
+            CustomDatePicker("Created date", createdDateText) { date ->
+                createdDateText = date.toString()
+            }
+
+            CustomDatePicker("Completed date", completedDateText) { date ->
+                completedDateText = date.toString()
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            )
+            {
+                Button(
+                    colors = ButtonDefaults.buttonColors(backgroundColor = color_error),
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(62.dp)
+                        .padding(top = 16.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    onClick = {
+                        var mtodo: Todo =
+                            Todo(
+                                todo.value.title,
+                                todo.value.description,
+                                todo.value.status,
+                                todo.value.createdDate,
+                                todo.value.completedDate
+                            )
+                        mtodo.id = todo.value.id
+                        val compositeDisposable = CompositeDisposable()
+                        compositeDisposable.add(
+                            viewModel
+                                .deleteTodo(mtodo)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(Action {
+                                    try {
+                                        coroutineScope.launch {
+                                            Toast.makeText(
+                                                mContext,
+                                                "Data has been deleted successfully!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            viewModel.scope.launch { viewModel.modalEditState.hide() }
+                                        }
+                                    } catch (e: Exception) {
+                                        coroutineScope.launch {
+                                            scaffoldState.snackbarHostState.showSnackbar(
+                                                message = "Data deleted fail!",
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
+                                    }
+                                    compositeDisposable.dispose()
+                                })
+                        )
+                    })
+                {
+                    Text(
+                        text = "Delete",
+                        style = MaterialTheme.typography.h6,
+                        color = Color.White
+                    )
+                }
+                Button(modifier = Modifier
+                    .width(120.dp)
+                    .height(62.dp)
+                    .padding(top = 16.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    onClick = {
+
+                        var mtodo: Todo =
+                            Todo(tileText, descText, statusText, createdDateText, completedDateText)
+                        mtodo.id = todo.value.id
+                        val compositeDisposable = CompositeDisposable()
+                        compositeDisposable.add(
+                            viewModel
+                                .updateTodo(mtodo)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(Action {
+                                    try {
+                                        Toast.makeText(
+                                            mContext,
+                                            "Data has been edit successfully!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        viewModel.scope.launch { viewModel.modalEditState.hide() }
+
+                                    } catch (e: Exception) {
+                                        coroutineScope.launch {
+                                            scaffoldState.snackbarHostState.showSnackbar(
+                                                message = "Data edit fail!",
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
+                                    }
+                                    compositeDisposable.dispose()
+                                })
+                        )
+                    })
+                {
+                    Text(
+                        text = "Edit",
+                        style = MaterialTheme.typography.h6,
+                        color = Color.White
+                    )
+                }
+            }
         }
     }
 }

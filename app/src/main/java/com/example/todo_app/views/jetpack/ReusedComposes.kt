@@ -1,12 +1,16 @@
 package com.example.todo_app.views.jetpack
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.Icon
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
@@ -25,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.todo_app.models.Todo
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
@@ -36,19 +39,17 @@ typealias ComposableFun = @Composable () -> Unit
 
 class TabItem(var title: String, var screen: ComposableFun)
 
-data class ScreenState(
-    val isLoading: Boolean = false,
-    val items: List<Todo> = emptyList(),
-    val error: String? = null,
-    val endReached: Boolean = false,
-    val page: Int = 0
-)
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
-fun CustomTextField(label: String, value: String, onValueChanged: (String) -> Unit) {
+fun CustomTextField(
+    label: String,
+    value: String,
+    onValueChanged: (String) -> Unit)
+{
+
     var error: String by remember { mutableStateOf("") }
     var intialState: Number = 0
+
     OutlinedTextField(
         isError = error.isNotBlank(),
         modifier = Modifier.onFocusChanged {
@@ -63,8 +64,8 @@ fun CustomTextField(label: String, value: String, onValueChanged: (String) -> Un
         value = value,
         singleLine = true,
         onValueChange = onValueChanged,
-        label = { Text(text = label, fontWeight = FontWeight.Bold, fontSize = 21.sp) },
-        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 20.sp),
+        label = { Text(text = label, fontWeight = FontWeight.Bold, fontSize = 19.sp) },
+        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
         trailingIcon = {
             if (error.isNotBlank()) {
                 Icon(
@@ -80,7 +81,12 @@ fun CustomTextField(label: String, value: String, onValueChanged: (String) -> Un
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
-fun CustomDatePicker(label: String, value: String, onDateChangeFunc: (LocalDate) -> Unit) {
+fun CustomDatePicker(
+    label: String,
+    value: String,
+    onDateChangeFunc: (LocalDate) -> Unit)
+{
+
     var error: String by remember { mutableStateOf("") }
     var intialState: Number = 0
     val calendarState = rememberSheetState()
@@ -111,8 +117,8 @@ fun CustomDatePicker(label: String, value: String, onDateChangeFunc: (LocalDate)
         singleLine = true,
         readOnly = true,
         onValueChange = {},
-        label = { Text(text = label, fontWeight = FontWeight.Bold, fontSize = 21.sp) },
-        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 20.sp),
+        label = { Text(text = label, fontWeight = FontWeight.Bold, fontSize = 19.sp) },
+        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
         trailingIcon = {
             if (error.isNotBlank()) {
                 Icon(
@@ -132,25 +138,28 @@ fun CustomDropdown(
     label: String,
     value: String,
     onSelectionChange: (String) -> Unit,
-    editStatus: String
-) {
+    editStatus: String)
+{
+
+    var selectedText by remember { mutableStateOf("")}
+    var expanded by remember { mutableStateOf(false) }
 
     val todoStatus = arrayOf("Pending", "Completed")
-    var expanded by remember { mutableStateOf(false) }
     var index = 0
     if (todoStatus[1].equals(editStatus)) index = 1
-    var selectedText by remember { mutableStateOf(todoStatus[index]) }
+
+    selectedText = todoStatus[index]
 
     ExposedDropdownMenuBox(
-        modifier = Modifier.padding(bottom = 24.dp),
+        modifier = Modifier.padding(bottom = 20.dp),
         expanded = expanded,
         onExpandedChange = {
             expanded = !expanded
         }
     ) {
         OutlinedTextField(
-            label = { Text(text = label, fontWeight = FontWeight.Bold, fontSize = 21.sp) },
-            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 20.sp),
+            label = { Text(text = label, fontWeight = FontWeight.Bold, fontSize = 19.sp) },
+            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 18.sp),
             singleLine = true,
             value = selectedText,
             onValueChange = onSelectionChange,
@@ -184,6 +193,7 @@ fun CustomAlertDialog(
     handleConfirmFunc: () -> Unit,
     handleDismissFunc: () -> Unit
 ) {
+
     val openDialog = remember { mutableStateOf(isOpen) }
 
     if (openDialog.value) {
@@ -222,5 +232,20 @@ fun CustomAlertDialog(
     }
 }
 
-
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun CustomBottomSheet(
+    bottomSheetState: ModalBottomSheetState,
+    sheetContent: @Composable ColumnScope.() -> Unit,
+) {
+    ModalBottomSheetLayout(
+        sheetState = bottomSheetState,
+        sheetContent = {
+            sheetContent()
+        },
+        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        sheetElevation = 16.dp
+    ) {
+    }
+}
 
