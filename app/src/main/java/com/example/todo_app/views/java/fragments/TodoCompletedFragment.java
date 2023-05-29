@@ -19,6 +19,7 @@ import com.example.todo_app.R;
 import com.example.todo_app.adapters.PaginationScrollListener;
 import com.example.todo_app.adapters.TodoAdapter;
 import com.example.todo_app.databinding.FragmentTodoCompletedBinding;
+import com.example.todo_app.helpers.CustomLinearLayoutManager;
 import com.example.todo_app.models.Todo;
 import com.example.todo_app.view_models.TodoViewModel;
 
@@ -65,8 +66,13 @@ public class TodoCompletedFragment extends Fragment {
     }
 
     private void loadTodo() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        fragmentTodoCompletedBinding.rclvTodoCompleted.setLayoutManager(linearLayoutManager);
+
+        View customItemView = LayoutInflater.from(getContext()).inflate(R.layout.todo_item, null);
+        customItemView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        int itemHeight = customItemView.getMeasuredHeight();
+
+        CustomLinearLayoutManager layoutManager = new CustomLinearLayoutManager(getContext(), itemHeight*10, itemHeight*10);
+        fragmentTodoCompletedBinding.rclvTodoCompleted.setLayoutManager(layoutManager);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireContext()
                 , DividerItemDecoration.VERTICAL);
@@ -99,7 +105,7 @@ public class TodoCompletedFragment extends Fragment {
                     loadFirstPage();
                 }));
 
-        fragmentTodoCompletedBinding.rclvTodoCompleted.addOnScrollListener(new PaginationScrollListener(linearLayoutManager) {
+        fragmentTodoCompletedBinding.rclvTodoCompleted.addOnScrollListener(new PaginationScrollListener(layoutManager) {
             @Override
             public void loadMore() {
                 isLoading = true;
