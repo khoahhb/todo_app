@@ -73,7 +73,8 @@ public class TodoAllFragment extends Fragment {
         customItemView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         int itemHeight = customItemView.getMeasuredHeight();
 
-        CustomLinearLayoutManager layoutManager = new CustomLinearLayoutManager(getContext(), itemHeight*10, itemHeight*10);
+        CustomLinearLayoutManager layoutManager = new CustomLinearLayoutManager(getContext(),
+                itemHeight*10, itemHeight*10);
         fragmentTodoAllBinding.rclvTodoAll.setLayoutManager(layoutManager);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireContext()
@@ -97,16 +98,16 @@ public class TodoAllFragment extends Fragment {
         todoViewModel.getKeyTranfer().observe(requireActivity(), s ->
                 todoViewModel.getListTodoAll()
                         .observe(requireActivity(), items -> {
-                    todoAllList = items;
-                    currentPage = 0;
-                    isLastPage = false;
-                    if (items.size() % 10 == 0) {
-                        totalPage = (items.size() / 10);
-                    } else {
-                        totalPage = (items.size() / 10) + 1;
-                    }
-                    loadFirstPage();
-                }));
+                            todoAllList = items;
+                            currentPage = 0;
+                            isLastPage = false;
+                            if (items.size() % 30 == 0) {
+                                totalPage = (items.size() / 30);
+                            } else {
+                                totalPage = (items.size() / 30) + 1;
+                            }
+                            loadFirstPage();
+                        }));
 
         fragmentTodoAllBinding.rclvTodoAll.addOnScrollListener(new PaginationScrollListener(layoutManager) {
             @Override
@@ -130,12 +131,12 @@ public class TodoAllFragment extends Fragment {
         fragmentTodoAllBinding.isLoadingTodoAll.setVisibility(View.VISIBLE);
         new Handler().postDelayed(() -> {
             startIndex = 0;
-            endIndex = 10;
-            if (todoAllList.size() > 10) {
+            endIndex = 30;
+            if (todoAllList.size() > 30) {
 
                 todoMainList = new ArrayList<>(todoAllList.subList(startIndex, endIndex));
                 startIndex = endIndex;
-                endIndex += 10;
+                endIndex += 30;
                 if (todoAllList.size() - 1 < endIndex) {
                     endIndex = todoAllList.size() - 1;
                 }
@@ -160,12 +161,11 @@ public class TodoAllFragment extends Fragment {
             if(todoAllList.size() > todoMainList.size()){
                 list = new ArrayList<>(todoAllList.subList(startIndex, endIndex));
                 startIndex = endIndex;
-                endIndex += 10;
+                endIndex += 30;
                 if (todoAllList.size() - 1 < endIndex) {
                     endIndex = todoAllList.size() - 1;
                 }
                 todoAdapter.removeFooterLoading();
-                todoMainList.addAll(list);
                 todoAdapter.addData(list);
                 isLoading = false;
                 if (currentPage < totalPage) {

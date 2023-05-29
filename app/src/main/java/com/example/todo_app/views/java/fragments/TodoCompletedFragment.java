@@ -97,10 +97,10 @@ public class TodoCompletedFragment extends Fragment {
                     todoAllList = items;
                     currentPage = 0;
                     isLastPage = false;
-                    if (items.size() % 10 == 0) {
-                        totalPage = (items.size() / 10);
+                    if (items.size() % 30 == 0) {
+                        totalPage = (items.size() / 30);
                     } else {
-                        totalPage = (items.size() / 10) + 1;
+                        totalPage = (items.size() / 30) + 1;
                     }
                     loadFirstPage();
                 }));
@@ -129,12 +129,12 @@ public class TodoCompletedFragment extends Fragment {
         fragmentTodoCompletedBinding.isLoadingTodoCompleted.setVisibility(View.VISIBLE);
         new Handler().postDelayed(() -> {
             startIndex = 0;
-            endIndex = 10;
-            if (todoAllList.size() > 10) {
+            endIndex = 30;
+            if (todoAllList.size() > 30) {
 
                 todoMainList = new ArrayList<>(todoAllList.subList(startIndex, endIndex));
                 startIndex = endIndex;
-                endIndex += 10;
+                endIndex += 30;
                 if (todoAllList.size() - 1 < endIndex) {
                     endIndex = todoAllList.size() - 1;
                 }
@@ -159,12 +159,11 @@ public class TodoCompletedFragment extends Fragment {
             if(todoAllList.size() > todoMainList.size()){
                 list = new ArrayList<>(todoAllList.subList(startIndex, endIndex));
                 startIndex = endIndex;
-                endIndex += 10;
+                endIndex += 30;
                 if (todoAllList.size() - 1 < endIndex) {
                     endIndex = todoAllList.size() - 1;
                 }
                 todoAdapter.removeFooterLoading();
-                todoMainList.addAll(list);
                 todoAdapter.addData(list);
                 isLoading = false;
                 if (currentPage < totalPage) {
