@@ -7,11 +7,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -32,12 +38,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LifecycleOwner
@@ -363,6 +375,11 @@ fun AllFragmentBS(
     var startIndex: Int = remember { 0 }
     var endtIndex: Int = remember { viewModel.endIndexAll }
 
+    var isLoading by remember {
+        mutableStateOf(viewModel.isShimmer)
+    }
+
+
     viewModel.getKeyTranfer().observe(owner) {
         viewModel.listTodoAll
             .observe(owner) { item ->
@@ -374,6 +391,12 @@ fun AllFragmentBS(
                     endtIndex = todoAllList.size
                 todoMainList.addAll(todoAllList.slice(startIndex until endtIndex))
             }
+    }
+
+    LaunchedEffect(key1 = true) {
+        delay(2000)
+        isLoading = false
+        viewModel.isShimmer = false
     }
 
     Column(
@@ -393,6 +416,7 @@ fun AllFragmentBS(
                         index ->
                 val todo = todoMainList.get(index)
                 TodoItemBS(
+                    isLoading,
                     viewModel,
                     owner,
                     todo,)
@@ -474,6 +498,7 @@ fun PendingFragmentBS(
                         index ->
                     val todo = todoMainList.get(index)
                     TodoItemBS(
+                        false,
                         viewModel,
                         owner,
                         todo,)
@@ -555,6 +580,7 @@ fun CompletedFragmentBS(
                         index ->
                     val todo = todoMainList.get(index)
                     TodoItemBS(
+                        false,
                         viewModel,
                         owner,
                         todo,)
@@ -588,10 +614,10 @@ fun CompletedFragmentBS(
     }
 }
 
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TodoItemBS(
+    isLoading: Boolean,
     viewModel: TodoViewModel,
     owner: LifecycleOwner,
     todoItem: Todo,
@@ -605,82 +631,170 @@ fun TodoItemBS(
         }
     }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .wrapContentHeight(align = Alignment.CenterVertically),
-        elevation = 8.dp,
-        onClick =
-        {
-            isChecked.value = !isChecked.value
-            if (isChecked.value) {
-                viewModel.setCheckItem(todoItem, true)
-            } else {
-                viewModel.setCheckItem(todoItem, false)
+    if(isLoading) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .wrapContentHeight(align = Alignment.CenterVertically),
+            elevation = 8.dp,
+            onClick =
+            {
+
             }
-        }
-    )
-    {
-        Row(
-            modifier = Modifier.height(64.dp),
-            verticalAlignment = Alignment.CenterVertically
         )
         {
-            Checkbox(
-                modifier = Modifier
-                    .fillMaxWidth(fraction = 0.1f)
-                    .padding(start = 8.dp),
-                checked = isChecked.value,
-                onCheckedChange =
-                {
-                    isChecked.value = it
-
-                    if (isChecked.value) {
-                        viewModel.setCheckItem(todoItem, true)
-                    } else {
-                        viewModel.setCheckItem(todoItem, false)
-                    }
-                }
+            Row(
+                modifier = Modifier.height(64.dp).shimmerEffect(),
+                verticalAlignment = Alignment.CenterVertically
             )
-            androidx.compose.material3.Text(
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .fillMaxWidth(fraction = 0.5f),
-                text = todoItem.title,
-                style =
-                if (isChecked.value)
-                    TextStyle(textDecoration = TextDecoration.LineThrough
-                ) else
-                    TextStyle(textDecoration = TextDecoration.None)
-            )
-            androidx.compose.material3.Text(
-                fontSize = 11.sp,
-                modifier = Modifier
-                    .padding(start = 6.dp)
-                    .fillMaxWidth(fraction = 0.45f),
-                text = todoItem.createdDate,
-                style =
-                if (isChecked.value)
-                    TextStyle(textDecoration = TextDecoration.LineThrough
-                ) else
-                    TextStyle(textDecoration = TextDecoration.None)
-            )
-            Spacer(
-                Modifier.weight(1f).fillMaxHeight()
-            )
-            Image(
-                painter = painterResource(id = R.drawable.ic_detail),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .clickable
+            {
+                Checkbox(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = 0.1f)
+                        .padding(start = 8.dp),
+                    checked = false,
+                    onCheckedChange =
                     {
-                        viewModel.todoEditItem.postValue(todoItem)
+
                     }
-                    .size(32.dp)
-                    .fillMaxWidth(fraction = 0.2f),
+                )
+                androidx.compose.material3.Text(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .fillMaxWidth(fraction = 0.5f),
+                    text = "",
+                )
+                androidx.compose.material3.Text(
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .padding(start = 6.dp)
+                        .fillMaxWidth(fraction = 0.45f),
+                    text = "",
+                )
+                Spacer(
+                    Modifier.weight(1f).fillMaxHeight()
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.ic_detail),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .clickable
+                        {
+                        }
+                        .size(32.dp)
+                        .fillMaxWidth(fraction = 0.2f),
+                )
+            }
+        }
+    } else {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .wrapContentHeight(align = Alignment.CenterVertically),
+            elevation = 8.dp,
+            onClick =
+            {
+                isChecked.value = !isChecked.value
+                if (isChecked.value) {
+                    viewModel.setCheckItem(todoItem, true)
+                } else {
+                    viewModel.setCheckItem(todoItem, false)
+                }
+            }
+        )
+        {
+            Row(
+                modifier = Modifier.height(64.dp),
+                verticalAlignment = Alignment.CenterVertically
             )
+            {
+                Checkbox(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = 0.1f)
+                        .padding(start = 8.dp),
+                    checked = isChecked.value,
+                    onCheckedChange =
+                    {
+                        isChecked.value = it
+
+                        if (isChecked.value) {
+                            viewModel.setCheckItem(todoItem, true)
+                        } else {
+                            viewModel.setCheckItem(todoItem, false)
+                        }
+                    }
+                )
+                androidx.compose.material3.Text(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .fillMaxWidth(fraction = 0.5f),
+                    text = todoItem.title,
+                    style =
+                    if (isChecked.value)
+                        TextStyle(textDecoration = TextDecoration.LineThrough
+                        ) else
+                        TextStyle(textDecoration = TextDecoration.None)
+                )
+                androidx.compose.material3.Text(
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .padding(start = 6.dp)
+                        .fillMaxWidth(fraction = 0.45f),
+                    text = todoItem.createdDate,
+                    style =
+                    if (isChecked.value)
+                        TextStyle(textDecoration = TextDecoration.LineThrough
+                        ) else
+                        TextStyle(textDecoration = TextDecoration.None)
+                )
+                Spacer(
+                    Modifier.weight(1f).fillMaxHeight()
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.ic_detail),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .clickable
+                        {
+                            viewModel.todoEditItem.postValue(todoItem)
+                        }
+                        .size(32.dp)
+                        .fillMaxWidth(fraction = 0.2f),
+                )
+            }
         }
     }
+}
+
+fun Modifier.shimmerEffect(): Modifier = composed {
+    var size by remember {
+        mutableStateOf(IntSize.Zero)
+    }
+    val transition = rememberInfiniteTransition()
+    val startOffsetX by transition.animateFloat(
+        initialValue = -2 * size.width.toFloat(),
+        targetValue = 2 * size.width.toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis= 1200,delayMillis = 100,easing = LinearOutSlowInEasing)
+        )
+    )
+
+    background(
+        brush = Brush.linearGradient(
+            colors = listOf(
+                Color(0xFFB8B5B5),
+                Color(0xFF8F8B8B),
+                Color(0xFFB8B5B5),
+            ),
+            start = Offset(startOffsetX, 0f),
+            end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
+        )
+    )
+        .onGloballyPositioned {
+            size = it.size
+        }
 }

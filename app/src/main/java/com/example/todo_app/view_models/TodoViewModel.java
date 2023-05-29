@@ -31,7 +31,7 @@ public class TodoViewModel extends AndroidViewModel {
     public static int endIndexAll = 20;
     public static int endIndexPending = 20;
     public static int endIndexCompleted = 20;
-
+    public static boolean isShimmer = true;
     public TodoViewModel(Application application) {
         super(application);
         mRepository = new TodoRepository(application);
@@ -104,6 +104,9 @@ public class TodoViewModel extends AndroidViewModel {
     public void setEndIndexCompleted(int value) {
         endIndexCompleted = value;
     }
+
+    public boolean getIsShimmer(){ return  isShimmer;}
+    public void setIsShimmer(boolean isShimmer_temp){isShimmer = isShimmer_temp;}
 
     public LiveData<List<Todo>> getListTodoAll() {
         mTodos = mRepository.getListTodoAll(keyTranfer.getValue());
