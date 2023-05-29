@@ -135,8 +135,8 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public void bind(Todo todo, int position) {
 
-//            todoItemBinding.ckbTitle.setText(todo.getTitle());
-            todoItemBinding.ckbTitle.setText("Item " + todo.getId());
+            todoItemBinding.ckbTitle.setText(todo.getTitle());
+//            todoItemBinding.ckbTitle.setText("Item " + todo.getId());
 
 
             List<Todo> checkedList = todoViewModel.getCheckedList().getValue();
