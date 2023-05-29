@@ -42,6 +42,7 @@ fun MainFrame(
     owner: LifecycleOwner,
     viewModel: TodoViewModel,
 ) {
+    viewModel.isShimmer = true
     MaterialTheme {
         AnimatedNavHost(navController = navController, startDestination = "todos_page") {
             composable("todos_page",

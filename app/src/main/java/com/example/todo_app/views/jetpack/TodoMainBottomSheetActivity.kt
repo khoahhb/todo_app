@@ -8,6 +8,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -37,7 +38,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -90,6 +93,8 @@ fun TodosScreenBottomSheet(
     viewModel: TodoViewModel,
     owner: LifecycleOwner,
 ) {
+
+    viewModel.isShimmer = true
 
     val scope = rememberCoroutineScope()
 
@@ -377,7 +382,6 @@ fun AllFragmentBS(
         mutableStateOf(viewModel.isShimmer)
     }
 
-
     viewModel.getKeyTranfer().observe(owner) {
         viewModel.listTodoAll
             .observe(owner) { item ->
@@ -623,6 +627,13 @@ fun TodoItemBS(
 
     val isChecked = remember { mutableStateOf(false) }
 
+    var isVisible by remember { mutableStateOf(false) }
+
+    val contentScale by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0.9f,
+        animationSpec = tween(durationMillis = 300)
+    )
+
     viewModel.checkedList.observe(owner) {
         if (it.contains(todoItem)) {
             isChecked.value = true
@@ -691,7 +702,8 @@ fun TodoItemBS(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-                .wrapContentHeight(align = Alignment.CenterVertically),
+                .wrapContentHeight(align = Alignment.CenterVertically)
+                .scale(contentScale),
             elevation = 8.dp,
             onClick =
             {
@@ -765,34 +777,9 @@ fun TodoItemBS(
                 )
             }
         }
-    }
-}
-
-fun Modifier.shimmerEffect(): Modifier = composed {
-    var size by remember {
-        mutableStateOf(IntSize.Zero)
-    }
-    val transition = rememberInfiniteTransition()
-    val startOffsetX by transition.animateFloat(
-        initialValue = -2 * size.width.toFloat(),
-        targetValue = 2 * size.width.toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis= 1200,delayMillis = 100,easing = LinearOutSlowInEasing)
-        )
-    )
-
-    background(
-        brush = Brush.linearGradient(
-            colors = listOf(
-                Color(0xFFB8B5B5),
-                Color(0xFF8F8B8B),
-                Color(0xFFB8B5B5),
-            ),
-            start = Offset(startOffsetX, 0f),
-            end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
-        )
-    )
-        .onGloballyPositioned {
-            size = it.size
+        LaunchedEffect(todoItem) {
+            isVisible = true
         }
+    }
 }
+

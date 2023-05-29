@@ -1,6 +1,9 @@
 package com.example.todo_app.views.jetpack
 
+import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,11 +50,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -324,6 +329,10 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
     var startIndex: Int = remember { 0 }
     var endtIndex: Int = remember { viewModel.endIndexAll}
 
+    var isLoading by remember {
+        mutableStateOf(viewModel.isShimmer)
+    }
+
     viewModel.getKeyTranfer().observe(owner) {
         viewModel.listTodoAll
             .observe(owner) { item ->
@@ -337,6 +346,12 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
             }
     }
 
+    LaunchedEffect(key1 = true) {
+        delay(2000)
+        isLoading = false
+        viewModel.isShimmer = false
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -348,7 +363,8 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
                     todoMainList[it].id },
                 itemContent = { index ->
                     val todo = todoMainList.get(index)
-                    TodoItem(
+                    TodoItemTemp(
+                        isLoading,
                         viewModel,
                         owner,
                         navController,
@@ -379,7 +395,6 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
                     }
                 }
             }
-
         }
     }
 }
@@ -424,10 +439,11 @@ fun PendingFragment(
                 count = todoMainList.size,
                 key = {
                     todoMainList[it].id
-                      },
+                },
                 itemContent = { index ->
                     val todo = todoMainList.get(index)
-                    TodoItem(
+                    TodoItemTemp(
+                        false,
                         viewModel,
                         owner,
                         navController,
@@ -506,7 +522,8 @@ fun CompletedFragment(
                       },
                 itemContent = { index ->
                     val todo = todoMainList.get(index)
-                    TodoItem(
+                    TodoItemTemp(
+                        false,
                         viewModel,
                         owner,
                         navController,
@@ -641,6 +658,179 @@ fun TodoItem(
                     .fillMaxWidth(fraction = 0.2f),
             )
         }
+    }
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun TodoItemTemp(
+    isLoading: Boolean,
+    viewModel: TodoViewModel,
+    owner: LifecycleOwner,
+    navController: NavHostController,
+    todoItem: Todo
+) {
+
+    val isChecked = remember { mutableStateOf(false) }
+
+//    var isVisible by remember { mutableStateOf(false) }
+//
+//    val contentScale by animateFloatAsState(
+//        targetValue = if (isVisible) 1f else 0.9f,
+//        animationSpec = tween(durationMillis = 300)
+//    )
+
+    viewModel.checkedList.observe(owner) {
+        if (it.contains(todoItem)) {
+            isChecked.value = true
+        }
+    }
+
+    if(isLoading) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .wrapContentHeight(align = Alignment.CenterVertically),
+            elevation = 8.dp,
+            onClick =
+            {
+
+            }
+        )
+        {
+            Row(
+                modifier = Modifier.height(64.dp).shimmerEffect(),
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                Checkbox(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = 0.1f)
+                        .padding(start = 8.dp),
+                    checked = false,
+                    onCheckedChange =
+                    {
+
+                    }
+                )
+                androidx.compose.material3.Text(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .fillMaxWidth(fraction = 0.5f),
+                    text = "",
+                )
+                androidx.compose.material3.Text(
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .padding(start = 6.dp)
+                        .fillMaxWidth(fraction = 0.45f),
+                    text = "",
+                )
+                Spacer(
+                    Modifier.weight(1f).fillMaxHeight()
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.ic_detail),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .clickable
+                        {
+                        }
+                        .size(32.dp)
+                        .fillMaxWidth(fraction = 0.2f),
+                )
+            }
+        }
+    } else {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .wrapContentHeight(align = Alignment.CenterVertically),
+            elevation = 8.dp,
+            onClick =
+            {
+                isChecked.value = !isChecked.value
+                if (isChecked.value) {
+                    viewModel.setCheckItem(todoItem, true)
+                } else {
+                    viewModel.setCheckItem(todoItem, false)
+                }
+            }
+        )
+        {
+            Row(
+                modifier = Modifier.height(64.dp),
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                Checkbox(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = 0.1f)
+                        .padding(start = 8.dp),
+                    checked = isChecked.value,
+                    onCheckedChange =
+                    {
+                        isChecked.value = it
+
+                        if (isChecked.value) {
+                            viewModel.setCheckItem(todoItem, true)
+                        } else {
+                            viewModel.setCheckItem(todoItem, false)
+                        }
+                    }
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .fillMaxWidth(fraction = 0.5f),
+                    text = todoItem.title,
+                    style = if (isChecked.value) TextStyle(
+                        textDecoration = TextDecoration.LineThrough
+                    ) else TextStyle(textDecoration = TextDecoration.None)
+                )
+                Text(
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .padding(start = 6.dp)
+                        .fillMaxWidth(fraction = 0.45f),
+                    text = todoItem.createdDate,
+                    style = if (isChecked.value) TextStyle(
+                        textDecoration = TextDecoration.LineThrough
+                    ) else TextStyle(textDecoration = TextDecoration.None)
+                )
+                Spacer(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.ic_detail),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .clickable
+                        {
+                            val moshi = Moshi
+                                .Builder()
+                                .build()
+                            val jsonAdapter = moshi
+                                .adapter(Todo::class.java)
+                                .lenient()
+                            val todoItemJson = jsonAdapter.toJson(todoItem)
+                            navController.navigate("edit_todo_page/" + todoItemJson)
+                        }
+                        .size(32.dp)
+                        .fillMaxWidth(fraction = 0.2f),
+                )
+            }
+        }
+//        LaunchedEffect(todoItem) {
+//            isVisible = true
+//        }
     }
 }
 

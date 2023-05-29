@@ -154,10 +154,9 @@ public class TodoPendingFragment extends Fragment {
                 if (todoAllList.size() - 1 < endIndex) {
                     endIndex = todoAllList.size() - 1;
                 }
-
                 todoAdapter.removeFooterLoading();
                 todoMainList.addAll(list);
-                todoAdapter.setData(todoMainList);
+                todoAdapter.addData(list);
                 isLoading = false;
                 if (currentPage < totalPage) {
                     todoAdapter.addFooterLoading();

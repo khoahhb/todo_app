@@ -4,6 +4,8 @@ import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -13,6 +15,7 @@ import com.example.todo_app.databinding.ItemLoadingBinding;
 import com.example.todo_app.databinding.TodoItemBinding;
 import com.example.todo_app.models.Todo;
 import com.example.todo_app.view_models.TodoViewModel;
+import com.example.todo_app.R;
 
 import java.util.List;
 
@@ -37,6 +40,16 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void setData(List<Todo> list) {
         this.mTodoList = list;
         notifyDataSetChanged();
+    }
+    public void addData(List<Todo> list) {
+        int listSize = this.mTodoList.size();
+
+        int addSize = list.size();
+
+        for(int i = 0 ;i <addSize; i ++){
+            this.mTodoList.add(list.get(i));
+            notifyItemInserted(listSize + i);
+        }
     }
 
     public void loadChangedData() {
@@ -90,7 +103,9 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (holder.getItemViewType() == TYPE_ITEM) {
             Todo todo = mTodoList.get(position);
             TodoViewHolder todoViewHolder = (TodoViewHolder) holder;
+            Animation animation = AnimationUtils.loadAnimation(todoViewHolder.itemView.getContext(), R.anim.enlarge);
             todoViewHolder.bind(todo,position);
+            todoViewHolder.itemView.startAnimation(animation);
         }
     }
 
