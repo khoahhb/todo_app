@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,10 +51,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun TodoEditScreen(
-    viewModel: TodoViewModel,
-    owner: LifecycleOwner,
-    todo: Todo,
-    navController: NavHostController
+        viewModel: TodoViewModel,
+        owner: LifecycleOwner,
+        todo: Todo,
+        navController: NavHostController
 ) {
 
     var statusText: String by remember { mutableStateOf(todo.status) }
@@ -65,19 +66,20 @@ fun TodoEditScreen(
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(modifier = Modifier, scaffoldState = scaffoldState) {
+    Scaffold(
+            modifier = Modifier, scaffoldState = scaffoldState, topBar = { CustomTopAppBar() {navController.navigateUp()} },
+    ) {
         it
         Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = "Edit todo screen",
-                color = colorResource(R.color.md_theme_light_primary),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(bottom = 32.dp),
+            androidx.compose.material3.Text(
+                    text = "Edit todo screen",
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 24.dp, top = 16.dp),
             )
             CustomDropdown("Status", statusText, { text ->
                 statusText = text
@@ -99,102 +101,102 @@ fun TodoEditScreen(
                 completedDateText = date.toString()
             }
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
             )
             {
                 Button(
-                    colors = ButtonDefaults.buttonColors(backgroundColor = color_error),
-                    modifier = Modifier
-                        .width(120.dp)
-                        .height(62.dp)
-                        .padding(top = 16.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    onClick = {
-                        val compositeDisposable = CompositeDisposable()
-                        compositeDisposable.add(
-                            viewModel
-                                .deleteTodo(todo)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(Action {
-                                    try {
-                                        coroutineScope.launch {
-                                            Toast.makeText(
-                                                mContext,
-                                                "Data has been deleted successfully!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            navController.popBackStack(
-                                                route = "todos_page",
-                                                inclusive = false,
-                                                saveState = true
-                                            )
-                                        }
-                                    } catch (e: Exception) {
-                                        coroutineScope.launch {
-                                            scaffoldState.snackbarHostState.showSnackbar(
-                                                message = "Data deleted fail!",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        }
-                                    }
-                                    compositeDisposable.dispose()
-                                })
-                        )
-                    })
+                        colors = ButtonDefaults.buttonColors(backgroundColor = color_error),
+                        modifier = Modifier
+                                .width(120.dp)
+                                .height(62.dp)
+                                .padding(top = 16.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        onClick = {
+                            val compositeDisposable = CompositeDisposable()
+                            compositeDisposable.add(
+                                    viewModel
+                                            .deleteTodo(todo)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(Action {
+                                                try {
+                                                    coroutineScope.launch {
+                                                        Toast.makeText(
+                                                                mContext,
+                                                                "Data has been deleted successfully!",
+                                                                Toast.LENGTH_SHORT
+                                                        ).show()
+                                                        navController.popBackStack(
+                                                                route = "todos_page",
+                                                                inclusive = false,
+                                                                saveState = true
+                                                        )
+                                                    }
+                                                } catch (e: Exception) {
+                                                    coroutineScope.launch {
+                                                        scaffoldState.snackbarHostState.showSnackbar(
+                                                                message = "Data deleted fail!",
+                                                                duration = SnackbarDuration.Short
+                                                        )
+                                                    }
+                                                }
+                                                compositeDisposable.dispose()
+                                            })
+                            )
+                        })
                 {
                     Text(
-                        text = "Delete",
-                        style = MaterialTheme.typography.h6,
-                        color = Color.White
+                            text = "Delete",
+                            style = MaterialTheme.typography.h6,
+                            color = Color.White
                     )
                 }
                 Button(modifier = Modifier
-                    .width(120.dp)
-                    .height(62.dp)
-                    .padding(top = 16.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    onClick = {
+                        .width(120.dp)
+                        .height(62.dp)
+                        .padding(top = 16.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        onClick = {
 
-                        var mtodo: Todo =
-                            Todo(tileText, descText, statusText, createdDateText, completedDateText)
-                        mtodo.id = todo.id
-                        val compositeDisposable = CompositeDisposable()
-                        compositeDisposable.add(
-                            viewModel
-                                .updateTodo(mtodo)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(Action {
-                                    try {
-                                        Toast.makeText(
-                                            mContext,
-                                            "Data has been edit successfully!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        navController.popBackStack(
-                                            route = "todos_page",
-                                            inclusive = false,
-                                            saveState = true
-                                        )
-                                    } catch (e: Exception) {
-                                        coroutineScope.launch {
-                                            scaffoldState.snackbarHostState.showSnackbar(
-                                                message = "Data edit fail!",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        }
-                                    }
-                                    compositeDisposable.dispose()
-                                })
-                        )
-                    })
+                            var mtodo: Todo =
+                                    Todo(tileText, descText, statusText, createdDateText, completedDateText)
+                            mtodo.id = todo.id
+                            val compositeDisposable = CompositeDisposable()
+                            compositeDisposable.add(
+                                    viewModel
+                                            .updateTodo(mtodo)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(Action {
+                                                try {
+                                                    Toast.makeText(
+                                                            mContext,
+                                                            "Data has been edit successfully!",
+                                                            Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    navController.popBackStack(
+                                                            route = "todos_page",
+                                                            inclusive = false,
+                                                            saveState = true
+                                                    )
+                                                } catch (e: Exception) {
+                                                    coroutineScope.launch {
+                                                        scaffoldState.snackbarHostState.showSnackbar(
+                                                                message = "Data edit fail!",
+                                                                duration = SnackbarDuration.Short
+                                                        )
+                                                    }
+                                                }
+                                                compositeDisposable.dispose()
+                                            })
+                            )
+                        })
                 {
                     Text(
-                        text = "Edit",
-                        style = MaterialTheme.typography.h6,
-                        color = Color.White
+                            text = "Edit",
+                            style = MaterialTheme.typography.h6,
+                            color = Color.White
                     )
                 }
             }
@@ -205,8 +207,8 @@ fun TodoEditScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun TodoEditScreenBottomSheet(
-    viewModel: TodoViewModel,
-    owner: LifecycleOwner,
+        viewModel: TodoViewModel,
+        owner: LifecycleOwner,
 ) {
     val todo = remember { mutableStateOf(Todo()) }
     var statusText: String by remember { mutableStateOf("Pending") }
@@ -234,20 +236,20 @@ fun TodoEditScreenBottomSheet(
         completedDateText = todo.value.completedDate
     }
 
-    Scaffold(modifier = Modifier, scaffoldState = scaffoldState) {
+    Scaffold(modifier = Modifier.fillMaxHeight(fraction = 0.85f), scaffoldState = scaffoldState) {
         it
         Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = "Edit todo screen",
-                color = colorResource(R.color.md_theme_light_primary),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
+            androidx.compose.material3.Text(
+                    text = "Edit todo screen",
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 24.dp, top = 16.dp),
             )
 
             CustomDropdown("Status", statusText, { text ->
@@ -271,104 +273,104 @@ fun TodoEditScreenBottomSheet(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
             )
             {
                 Button(
-                    colors = ButtonDefaults.buttonColors(backgroundColor = color_error),
-                    modifier = Modifier
-                        .width(120.dp)
-                        .height(62.dp)
-                        .padding(top = 16.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    onClick = {
-                        var mtodo: Todo =
-                            Todo(
-                                todo.value.title,
-                                todo.value.description,
-                                todo.value.status,
-                                todo.value.createdDate,
-                                todo.value.completedDate
+                        colors = ButtonDefaults.buttonColors(backgroundColor = color_error),
+                        modifier = Modifier
+                                .width(120.dp)
+                                .height(62.dp)
+                                .padding(top = 16.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        onClick = {
+                            var mtodo: Todo =
+                                    Todo(
+                                            todo.value.title,
+                                            todo.value.description,
+                                            todo.value.status,
+                                            todo.value.createdDate,
+                                            todo.value.completedDate
+                                    )
+                            mtodo.id = todo.value.id
+                            val compositeDisposable = CompositeDisposable()
+                            compositeDisposable.add(
+                                    viewModel
+                                            .deleteTodo(mtodo)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(Action {
+                                                try {
+                                                    coroutineScope.launch {
+                                                        Toast.makeText(
+                                                                mContext,
+                                                                "Data has been deleted successfully!",
+                                                                Toast.LENGTH_SHORT
+                                                        ).show()
+                                                        viewModel.scope.launch { viewModel.modalEditState.hide() }
+                                                    }
+                                                } catch (e: Exception) {
+                                                    coroutineScope.launch {
+                                                        scaffoldState.snackbarHostState.showSnackbar(
+                                                                message = "Data deleted fail!",
+                                                                duration = SnackbarDuration.Short
+                                                        )
+                                                    }
+                                                }
+                                                compositeDisposable.dispose()
+                                            })
                             )
-                        mtodo.id = todo.value.id
-                        val compositeDisposable = CompositeDisposable()
-                        compositeDisposable.add(
-                            viewModel
-                                .deleteTodo(mtodo)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(Action {
-                                    try {
-                                        coroutineScope.launch {
-                                            Toast.makeText(
-                                                mContext,
-                                                "Data has been deleted successfully!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            viewModel.scope.launch { viewModel.modalEditState.hide() }
-                                        }
-                                    } catch (e: Exception) {
-                                        coroutineScope.launch {
-                                            scaffoldState.snackbarHostState.showSnackbar(
-                                                message = "Data deleted fail!",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        }
-                                    }
-                                    compositeDisposable.dispose()
-                                })
-                        )
-                    })
+                        })
                 {
                     Text(
-                        text = "Delete",
-                        style = MaterialTheme.typography.h6,
-                        color = Color.White
+                            text = "Delete",
+                            style = MaterialTheme.typography.h6,
+                            color = Color.White
                     )
                 }
                 Button(modifier = Modifier
-                    .width(120.dp)
-                    .height(62.dp)
-                    .padding(top = 16.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    onClick = {
+                        .width(120.dp)
+                        .height(62.dp)
+                        .padding(top = 16.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        onClick = {
 
-                        var mtodo: Todo =
-                            Todo(tileText, descText, statusText, createdDateText, completedDateText)
-                        mtodo.id = todo.value.id
-                        val compositeDisposable = CompositeDisposable()
-                        compositeDisposable.add(
-                            viewModel
-                                .updateTodo(mtodo)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(Action {
-                                    try {
-                                        Toast.makeText(
-                                            mContext,
-                                            "Data has been edit successfully!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        viewModel.scope.launch { viewModel.modalEditState.hide() }
+                            var mtodo: Todo =
+                                    Todo(tileText, descText, statusText, createdDateText, completedDateText)
+                            mtodo.id = todo.value.id
+                            val compositeDisposable = CompositeDisposable()
+                            compositeDisposable.add(
+                                    viewModel
+                                            .updateTodo(mtodo)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(Action {
+                                                try {
+                                                    Toast.makeText(
+                                                            mContext,
+                                                            "Data has been edit successfully!",
+                                                            Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    viewModel.scope.launch { viewModel.modalEditState.hide() }
 
-                                    } catch (e: Exception) {
-                                        coroutineScope.launch {
-                                            scaffoldState.snackbarHostState.showSnackbar(
-                                                message = "Data edit fail!",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        }
-                                    }
-                                    compositeDisposable.dispose()
-                                })
-                        )
-                    })
+                                                } catch (e: Exception) {
+                                                    coroutineScope.launch {
+                                                        scaffoldState.snackbarHostState.showSnackbar(
+                                                                message = "Data edit fail!",
+                                                                duration = SnackbarDuration.Short
+                                                        )
+                                                    }
+                                                }
+                                                compositeDisposable.dispose()
+                                            })
+                            )
+                        })
                 {
                     Text(
-                        text = "Edit",
-                        style = MaterialTheme.typography.h6,
-                        color = Color.White
+                            text = "Edit",
+                            style = MaterialTheme.typography.h6,
+                            color = Color.White
                     )
                 }
             }

@@ -3,9 +3,11 @@ package com.example.todo_app.views.jetpack
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -62,19 +64,18 @@ fun TodoAddScreen(
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(modifier = Modifier, scaffoldState = scaffoldState) {
+    Scaffold(modifier = Modifier, scaffoldState = scaffoldState, topBar = { CustomTopAppBar() {navController.navigateUp()}}) {
         it
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Add todo screen",
-                color = colorResource(R.color.md_theme_light_primary),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(bottom = 32.dp),
+            androidx.compose.material3.Text(
+                    text = "Add todo screen",
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 24.dp, top = 16.dp),
             )
 
             CustomDropdown("Status", statusText, { text ->
@@ -167,7 +168,7 @@ fun TodoAddScreenBottomSheet(
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(modifier = Modifier, scaffoldState = scaffoldState) {
+    Scaffold(modifier = Modifier.fillMaxHeight(fraction = 0.85f), scaffoldState = scaffoldState) {
         it
         Column(
             modifier = Modifier
@@ -175,12 +176,12 @@ fun TodoAddScreenBottomSheet(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = "Add todo screen",
-                color = colorResource(R.color.md_theme_light_primary),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
+            androidx.compose.material3.Text(
+                    text = "Add todo screen",
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(bottom = 24.dp, top = 16.dp),
             )
 
             CustomDropdown("Status", statusText, { text ->

@@ -13,27 +13,21 @@
         android:theme="@style/Theme.App"
         tools:targetApi="31">
         <activity
-            android:name=".views.jetpack.TodoMainBottomSheetActivity"
-            android:exported="false"
-            android:label="@string/title_activity_todo_main_bottom_sheet"
-            android:theme="@style/Theme.App" />
-        <activity
-            android:name=".views.jetpack.NavActivity"
-            android:exported="false"
+            android:name=".views.NavActivity"
+            android:exported="true"
             android:label="@string/title_activity_nav"
-            android:theme="@style/Theme.App" />
-        <activity
-            android:name=".views.java.activities.FrameActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SwitchFrameworkActivity"
-            android:exported="true">
+            android:theme="@style/Theme.App" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".views.java.activities.FrameActivity"
+            android:exported="false" />
+
+
     </application>
 
 </manifest>
