@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/todoListFragment"
         android:name="com.example.todo_app.views.java.fragments.TodoListFragment"
-        android:label="fragment_todo_list"
+        android:label="Main screen"
         tools:layout="@layout/fragment_todo_list" >
         <action
             android:id="@+id/action_todoListFragment_to_todoAddFragment"
@@ -21,7 +21,7 @@
     <fragment
         android:id="@+id/todoAddFragment"
         android:name="com.example.todo_app.views.java.fragments.TodoAddFragment"
-        android:label="fragment_todo_add"
+        android:label="Add todo screen"
         tools:layout="@layout/fragment_todo_add" >
         <action
             android:id="@+id/action_todoAddFragment_to_todoListFragment"
@@ -31,7 +31,7 @@
     <fragment
         android:id="@+id/todoEditFragment"
         android:name="com.example.todo_app.views.java.fragments.TodoEditFragment"
-        android:label="fragment_todo_edit"
+        android:label="Edit todo screen"
         tools:layout="@layout/fragment_todo_edit" >
         <action
             android:id="@+id/action_todoEditFragment_to_todoListFragment"
