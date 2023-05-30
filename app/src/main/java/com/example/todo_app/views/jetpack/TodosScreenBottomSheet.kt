@@ -162,7 +162,7 @@ fun TodosScreenBottomSheet(
             Text(
                     text = "Main screen",
                     color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 36.sp,
+                    fontSize = 34.sp,
                     fontWeight = FontWeight.ExtraBold,
                     modifier = Modifier.padding(bottom = 16.dp, top = 0.dp),
             )

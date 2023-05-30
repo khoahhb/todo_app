@@ -77,7 +77,7 @@ fun TodoEditScreen(
             androidx.compose.material3.Text(
                     text = "Edit todo screen",
                     color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
-                    fontSize = 36.sp,
+                    fontSize = 34.sp,
                     fontWeight = FontWeight.ExtraBold,
                     modifier = Modifier.padding(bottom = 24.dp, top = 16.dp),
             )
@@ -247,7 +247,7 @@ fun TodoEditScreenBottomSheet(
             androidx.compose.material3.Text(
                     text = "Edit todo screen",
                     color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
-                    fontSize = 36.sp,
+                    fontSize = 34.sp,
                     fontWeight = FontWeight.ExtraBold,
                     modifier = Modifier.padding(bottom = 24.dp, top = 16.dp),
             )
