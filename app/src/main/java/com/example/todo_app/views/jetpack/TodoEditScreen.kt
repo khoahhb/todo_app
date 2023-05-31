@@ -67,7 +67,12 @@ fun TodoEditScreen(
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-            modifier = Modifier, scaffoldState = scaffoldState, topBar = { CustomTopAppBar() {navController.navigateUp()} },
+            modifier = Modifier, scaffoldState = scaffoldState,
+            topBar = { CustomTopAppBar(false,
+                    { navController.navigateUp() },
+                    { navController.navigate("switch") },
+                    { navController.navigate("todos_page") },
+                    { navController.navigate("add_todo_page") }) },
     ) {
         it
         Column(

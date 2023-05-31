@@ -116,7 +116,7 @@ fun TodosScreen(
                     Icon(Icons.Filled.Add, "")
                 }
             },
-            topBar = { CustomTopAppBar() {navController.navigateUp()} },
+            topBar = { CustomTopAppBar(false, {navController.navigateUp()},{navController.navigate("switch")},{navController.navigate("todos_page")},{navController.navigate("add_todo_page")})  },
 
             ) {
         it

@@ -51,9 +51,10 @@ fun MainFrame(
     viewModel: TodoViewModel,
 ) {
     viewModel.isShimmer = true
+
     MaterialTheme {
-        AnimatedNavHost(navController = navController, startDestination = "menu") {
-            composable("menu",
+        AnimatedNavHost(navController = navController, startDestination = "switch") {
+            composable("switch",
                     enterTransition = {
                         when (initialState.destination.route) {
                             "todos_page", "todos_page_bs" ->
@@ -74,7 +75,7 @@ fun MainFrame(
             composable("todos_page",
                     enterTransition = {
                         when (initialState.destination.route) {
-                            "menu" ->
+                            "switch" ->
                                 slideIntoContainer(
                                         AnimatedContentScope.SlideDirection.Left,
                                         animationSpec = tween(550)
@@ -101,7 +102,7 @@ fun MainFrame(
             composable("todos_page_bs",
                 enterTransition = {
                     when (initialState.destination.route) {
-                        "menu" ->
+                        "switch" ->
                             slideIntoContainer(
                                 AnimatedContentScope.SlideDirection.Left,
                                 animationSpec = tween(550)

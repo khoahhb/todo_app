@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_todoListFragment_to_todoEditFragment"
             app:destination="@id/todoEditFragment" />
+        <action
+            android:id="@+id/action_todoListFragment_to_navActivity"
+            app:destination="@id/navActivity" />
     </fragment>
 
     <fragment
@@ -37,5 +40,9 @@
             android:id="@+id/action_todoEditFragment_to_todoListFragment"
             app:destination="@id/todoListFragment" />
     </fragment>
+    <activity
+        android:id="@+id/navActivity"
+        android:name="com.example.todo_app.views.NavActivity"
+        android:label="NavActivity" />
 
 </navigation>

@@ -1,5 +1,6 @@
 package com.example.todo_app.views.jetpack
 
+import android.widget.Toast
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -25,9 +26,15 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialogDefaults.containerColor
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +55,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
@@ -303,14 +311,37 @@ fun Modifier.shimmerEffect(): Modifier = composed {
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTopAppBar(
+        isBS: Boolean,
         navBack: () -> Unit,
+        goSwitch: () -> Unit,
+        goMain: () -> Unit,
+        goAdd: () -> Unit,
 ) {
+
+    var showMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
     TopAppBar(
             modifier = Modifier
                     .fillMaxHeight(0.08f)
                     .padding(bottom = 0.dp),
             title = {
                 Text(text = "", color = Color.Black)
+            },
+            actions = {
+                IconButton(onClick = { showMenu = !showMenu }) {
+                    Icon(Icons.Default.MoreVert, "")
+                }
+                DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(onClick = {goSwitch() }, text = {  Text(text = "Switch")}, leadingIcon = {Icon(Icons.Default.Menu, "")})
+                    if(!isBS){
+                        DropdownMenuItem(onClick = {goMain() }, text = {  Text(text = "Main")}, leadingIcon = {Icon(Icons.Default.Home, "")})
+                        DropdownMenuItem(onClick = { goAdd()}, text = {  Text(text = "Add")}, leadingIcon = {Icon(Icons.Default.Add, "")})
+                    }
+                }
             },
             navigationIcon = {
                 IconButton(onClick = navBack, modifier = Modifier.padding(start = 4.dp, top = 8.dp)) {

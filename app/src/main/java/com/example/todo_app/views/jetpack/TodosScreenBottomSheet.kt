@@ -140,7 +140,7 @@ fun TodosScreenBottomSheet(
 
     Scaffold(
             modifier = Modifier,
-            topBar = { CustomTopAppBar() {navController.navigateUp()} },
+            topBar = { CustomTopAppBar(true, {navController.navigateUp()},{navController.navigate("switch")},{},{})  },
             floatingActionButton = {
                 FloatingActionButton(
                         backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,

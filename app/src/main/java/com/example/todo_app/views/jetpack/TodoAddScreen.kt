@@ -50,9 +50,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun TodoAddScreen(
-    viewModel: TodoViewModel,
-    owner: LifecycleOwner,
-    navController: NavHostController
+        viewModel: TodoViewModel,
+        owner: LifecycleOwner,
+        navController: NavHostController
 ) {
 
     var statusText: String by remember { mutableStateOf("Pending") }
@@ -64,11 +64,18 @@ fun TodoAddScreen(
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(modifier = Modifier, scaffoldState = scaffoldState, topBar = { CustomTopAppBar() {navController.navigateUp()}}) {
+    Scaffold(
+            modifier = Modifier, scaffoldState = scaffoldState,
+            topBar = { CustomTopAppBar(false,
+                    { navController.navigateUp() },
+                    { navController.navigate("switch") },
+                    { navController.navigate("todos_page") },
+                    { navController.navigate("add_todo_page") }) },
+    ) {
         it
         Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             androidx.compose.material3.Text(
                     text = "Add todo screen",
@@ -99,52 +106,52 @@ fun TodoAddScreen(
             }
 
             Button(modifier = Modifier
-                .width(200.dp)
-                .height(62.dp)
-                .padding(top = 16.dp),
-                shape = RoundedCornerShape(24.dp),
-                onClick = {
+                    .width(200.dp)
+                    .height(62.dp)
+                    .padding(top = 16.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    onClick = {
 
-                    var todo: Todo =
-                        Todo(tileText, descText, statusText, createdDateText, completedDateText)
+                        var todo: Todo =
+                                Todo(tileText, descText, statusText, createdDateText, completedDateText)
 
-                    val compositeDisposable = CompositeDisposable()
-                    compositeDisposable.add(
-                        viewModel
-                            .insertTodo(todo)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(Action {
-                                try {
-                                    coroutineScope.launch {
-                                        Toast.makeText(
-                                            mContext,
-                                            "Data has been saved successfully!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        navController.popBackStack(
-                                            route = "todos_page",
-                                            inclusive = false,
-                                            saveState = true
-                                        )
-                                    }
-                                } catch (e: Exception) {
-                                    coroutineScope.launch {
-                                        scaffoldState.snackbarHostState.showSnackbar(
-                                            message = "Data added fail!",
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    }
-                                }
-                                compositeDisposable.dispose()
-                            })
-                    )
-                })
+                        val compositeDisposable = CompositeDisposable()
+                        compositeDisposable.add(
+                                viewModel
+                                        .insertTodo(todo)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(Action {
+                                            try {
+                                                coroutineScope.launch {
+                                                    Toast.makeText(
+                                                            mContext,
+                                                            "Data has been saved successfully!",
+                                                            Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    navController.popBackStack(
+                                                            route = "todos_page",
+                                                            inclusive = false,
+                                                            saveState = true
+                                                    )
+                                                }
+                                            } catch (e: Exception) {
+                                                coroutineScope.launch {
+                                                    scaffoldState.snackbarHostState.showSnackbar(
+                                                            message = "Data added fail!",
+                                                            duration = SnackbarDuration.Short
+                                                    )
+                                                }
+                                            }
+                                            compositeDisposable.dispose()
+                                        })
+                        )
+                    })
             {
                 Text(
-                    text = "Add todo",
-                    style = MaterialTheme.typography.h6,
-                    color = Color.White
+                        text = "Add todo",
+                        style = MaterialTheme.typography.h6,
+                        color = Color.White
                 )
             }
         }
@@ -154,8 +161,8 @@ fun TodoAddScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun TodoAddScreenBottomSheet(
-    viewModel: TodoViewModel,
-    owner: LifecycleOwner,
+        viewModel: TodoViewModel,
+        owner: LifecycleOwner,
 ) {
 
     var statusText: String by remember { mutableStateOf("Pending") }
@@ -171,10 +178,10 @@ fun TodoAddScreenBottomSheet(
     Scaffold(modifier = Modifier.fillMaxHeight(fraction = 0.85f), scaffoldState = scaffoldState) {
         it
         Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             androidx.compose.material3.Text(
                     text = "Add todo screen",
@@ -205,54 +212,54 @@ fun TodoAddScreenBottomSheet(
             }
 
             Button(
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(62.dp)
-                    .padding(top = 16.dp),
-                shape = RoundedCornerShape(24.dp),
-                onClick = {
+                    modifier = Modifier
+                            .width(200.dp)
+                            .height(62.dp)
+                            .padding(top = 16.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    onClick = {
 
-                    var todo: Todo =
-                        Todo(tileText, descText, statusText, createdDateText, completedDateText)
+                        var todo: Todo =
+                                Todo(tileText, descText, statusText, createdDateText, completedDateText)
 
-                    val compositeDisposable = CompositeDisposable()
-                    compositeDisposable.add(
-                        viewModel
-                            .insertTodo(todo)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(Action {
-                                try {
-                                    coroutineScope.launch {
-                                        Toast.makeText(
-                                            mContext,
-                                            "Data has been saved successfully!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        statusText = ""
-                                        tileText = ""
-                                        descText = ""
-                                        createdDateText = ""
-                                        completedDateText = ""
-                                        viewModel.scope.launch { viewModel.modalAddState.hide() }
-                                    }
-                                } catch (e: Exception) {
-                                    coroutineScope.launch {
-                                        scaffoldState.snackbarHostState.showSnackbar(
-                                            message = "Data added fail!",
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    }
-                                }
-                                compositeDisposable.dispose()
-                            })
-                    )
-                })
+                        val compositeDisposable = CompositeDisposable()
+                        compositeDisposable.add(
+                                viewModel
+                                        .insertTodo(todo)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(Action {
+                                            try {
+                                                coroutineScope.launch {
+                                                    Toast.makeText(
+                                                            mContext,
+                                                            "Data has been saved successfully!",
+                                                            Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    statusText = ""
+                                                    tileText = ""
+                                                    descText = ""
+                                                    createdDateText = ""
+                                                    completedDateText = ""
+                                                    viewModel.scope.launch { viewModel.modalAddState.hide() }
+                                                }
+                                            } catch (e: Exception) {
+                                                coroutineScope.launch {
+                                                    scaffoldState.snackbarHostState.showSnackbar(
+                                                            message = "Data added fail!",
+                                                            duration = SnackbarDuration.Short
+                                                    )
+                                                }
+                                            }
+                                            compositeDisposable.dispose()
+                                        })
+                        )
+                    })
             {
                 Text(
-                    text = "Add todo",
-                    style = MaterialTheme.typography.h6,
-                    color = Color.White
+                        text = "Add todo",
+                        style = MaterialTheme.typography.h6,
+                        color = Color.White
                 )
             }
         }
