@@ -8,12 +8,10 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.FragmentNavigator;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.todo_app.R;
 import com.example.todo_app.adapters.PaginationScrollListener;
@@ -55,7 +53,7 @@ public class TodoPendingFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         fragmentTodoPendingBinding = FragmentTodoPendingBinding.inflate(inflater, container, false);
         View mView = fragmentTodoPendingBinding.getRoot();
@@ -75,21 +73,18 @@ public class TodoPendingFragment extends Fragment {
                 , DividerItemDecoration.VERTICAL);
         fragmentTodoPendingBinding.rclvTodoPending.addItemDecoration(dividerItemDecoration);
 
-        todoAdapter = new TodoAdapter(todoAllList, new TodoAdapter.TodoClickListener() {
-            @Override
-            public void onGoDetailItem(Todo todo, CardView cardView) {
-                FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
-                        .addSharedElement(cardView, "edit_fragment").build();
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("editItem", todo);
-                Navigation.findNavController(requireView()).navigate(R.id.todoEditFragment
-                        , bundle, null, extras);
-            }
+        todoAdapter = new TodoAdapter(todoAllList, (todo, cardView) -> {
+            FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
+                    .addSharedElement(cardView, "edit_fragment").build();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("editItem", todo);
+            Navigation.findNavController(requireView()).navigate(R.id.todoEditFragment
+                    , bundle, null, extras);
         }, todoViewModel);
 
         fragmentTodoPendingBinding.rclvTodoPending.setAdapter(todoAdapter);
 
-        todoViewModel.getKeyTranfer().observe(requireActivity(), s ->
+        todoViewModel.getKeyTransfer().observe(requireActivity(), s ->
                 todoViewModel.getListTodoByStatus("Pending").observe(requireActivity(), items -> {
                     todoAllList = items;
                     currentPage = 0;
@@ -138,7 +133,7 @@ public class TodoPendingFragment extends Fragment {
                 todoMainList = new ArrayList<>(todoAllList);
             }
             todoAdapter.setData(todoMainList);
-            if (currentPage < totalPage) {
+            if (currentPage < totalPage && todoAllList.size() > 30) {
                 todoAdapter.addFooterLoading();
             } else {
                 isLastPage = true;
@@ -150,7 +145,7 @@ public class TodoPendingFragment extends Fragment {
     private void loadNextPage() {
         new Handler().postDelayed(() -> {
 
-            List<Todo> list = new ArrayList<>();
+            List<Todo> list;
 
             if(todoAllList.size() > todoMainList.size()){
                 list = new ArrayList<>(todoAllList.subList(startIndex, endIndex));

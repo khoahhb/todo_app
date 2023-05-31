@@ -1,13 +1,13 @@
+@file:Suppress("UNUSED_EXPRESSION")
+
 package com.example.todo_app.views.jetpack
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -18,7 +18,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,28 +29,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
-import com.example.todo_app.R
 import com.example.todo_app.models.Todo
 import com.example.todo_app.view_models.TodoViewModel
-import com.example.todo_app.views.jetpack.ui.theme.color_success
-import com.google.accompanist.pager.ExperimentalPagerApi
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Action
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun TodoAddScreen(
         viewModel: TodoViewModel,
-        owner: LifecycleOwner,
         navController: NavHostController
 ) {
 
@@ -77,7 +68,7 @@ fun TodoAddScreen(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            androidx.compose.material3.Text(
+            Text(
                     text = "Add todo screen",
                     color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
                     fontSize = 34.sp,
@@ -85,7 +76,7 @@ fun TodoAddScreen(
                     modifier = Modifier.padding(bottom = 24.dp, top = 16.dp),
             )
 
-            CustomDropdown("Status", statusText, { text ->
+            CustomDropdown("Status", { text ->
                 statusText = text
             }, statusText)
 
@@ -112,7 +103,7 @@ fun TodoAddScreen(
                     shape = RoundedCornerShape(24.dp),
                     onClick = {
 
-                        var todo: Todo =
+                        val todo =
                                 Todo(tileText, descText, statusText, createdDateText, completedDateText)
 
                         val compositeDisposable = CompositeDisposable()
@@ -121,7 +112,7 @@ fun TodoAddScreen(
                                         .insertTodo(todo)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(Action {
+                                        .subscribe {
                                             try {
                                                 coroutineScope.launch {
                                                     Toast.makeText(
@@ -144,7 +135,7 @@ fun TodoAddScreen(
                                                 }
                                             }
                                             compositeDisposable.dispose()
-                                        })
+                                        }
                         )
                     })
             {
@@ -158,11 +149,10 @@ fun TodoAddScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TodoAddScreenBottomSheet(
         viewModel: TodoViewModel,
-        owner: LifecycleOwner,
 ) {
 
     var statusText: String by remember { mutableStateOf("Pending") }
@@ -183,7 +173,7 @@ fun TodoAddScreenBottomSheet(
                         .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            androidx.compose.material3.Text(
+            Text(
                     text = "Add todo screen",
                     color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
                     fontSize = 34.sp,
@@ -191,7 +181,7 @@ fun TodoAddScreenBottomSheet(
                     modifier = Modifier.padding(bottom = 24.dp, top = 16.dp),
             )
 
-            CustomDropdown("Status", statusText, { text ->
+            CustomDropdown("Status", { text ->
                 statusText = text
             }, statusText)
 
@@ -219,7 +209,7 @@ fun TodoAddScreenBottomSheet(
                     shape = RoundedCornerShape(24.dp),
                     onClick = {
 
-                        var todo: Todo =
+                        val todo =
                                 Todo(tileText, descText, statusText, createdDateText, completedDateText)
 
                         val compositeDisposable = CompositeDisposable()
@@ -228,7 +218,7 @@ fun TodoAddScreenBottomSheet(
                                         .insertTodo(todo)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(Action {
+                                        .subscribe {
                                             try {
                                                 coroutineScope.launch {
                                                     Toast.makeText(
@@ -252,7 +242,7 @@ fun TodoAddScreenBottomSheet(
                                                 }
                                             }
                                             compositeDisposable.dispose()
-                                        })
+                                        }
                         )
                     })
             {

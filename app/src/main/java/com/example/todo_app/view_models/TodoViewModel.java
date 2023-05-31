@@ -21,7 +21,7 @@ public class TodoViewModel extends AndroidViewModel {
 
     private final TodoRepository mRepository;
     private LiveData<List<Todo>> mTodos;
-    public MutableLiveData<String> keyTranfer = new MutableLiveData<>();
+    public MutableLiveData<String> keyTransfer = new MutableLiveData<>();
     public static final MutableLiveData<List<Todo>> checkedList = new MutableLiveData<>();
     public static final MutableLiveData<List<Todo>> uncheckedList = new MutableLiveData<>();
     public static CoroutineScope scope = null;
@@ -35,14 +35,14 @@ public class TodoViewModel extends AndroidViewModel {
     public TodoViewModel(Application application) {
         super(application);
         mRepository = new TodoRepository(application);
-        keyTranfer.postValue("");
+        keyTransfer.postValue("");
         checkedList.postValue(new ArrayList<>());
         uncheckedList.postValue(new ArrayList<>());
         todoEditItem.postValue(new Todo());
     }
 
-    public MutableLiveData<String> getKeyTranfer() {
-        return keyTranfer;
+    public MutableLiveData<String> getKeyTransfer() {
+        return keyTransfer;
     }
 
     public MutableLiveData<List<Todo>> getCheckedList() {
@@ -109,12 +109,12 @@ public class TodoViewModel extends AndroidViewModel {
     public void setIsShimmer(boolean isShimmer_temp){isShimmer = isShimmer_temp;}
 
     public LiveData<List<Todo>> getListTodoAll() {
-        mTodos = mRepository.getListTodoAll(keyTranfer.getValue());
+        mTodos = mRepository.getListTodoAll(keyTransfer.getValue());
         return mTodos;
     }
 
     public LiveData<List<Todo>> getListTodoByStatus(String status) {
-        mTodos = mRepository.getListTodoByStatus(status, keyTranfer.getValue());
+        mTodos = mRepository.getListTodoByStatus(status, keyTransfer.getValue());
         return mTodos;
     }
 
@@ -135,7 +135,7 @@ public class TodoViewModel extends AndroidViewModel {
 
         for (Todo e : Objects.requireNonNull(checkedList.getValue())) {
             ids.add(e.getId());
-            if (e.getStatus().equals("Completd") && e.getId() < endIndexCompleted && endIndexCompleted > 0) {
+            if (e.getStatus().equals("Completed") && e.getId() < endIndexCompleted && endIndexCompleted > 0) {
                 endIndexCompleted--;
             } else if (e.getStatus().equals("Pending") && e.getId() < endIndexPending && endIndexPending > 0) {
                 endIndexPending--;

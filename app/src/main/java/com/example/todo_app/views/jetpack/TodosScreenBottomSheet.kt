@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_EXPRESSION")
+
 package com.example.todo_app.views.jetpack
 
 import android.widget.Toast
@@ -75,7 +77,6 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Action
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -113,7 +114,7 @@ fun TodosScreenBottomSheet(
 
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
-    var historySearchItem = remember { mutableStateListOf("") }
+    val historySearchItem = remember { mutableStateListOf("") }
     historySearchItem.remove("")
     val pagerState = rememberPagerState()
     val tabs: MutableList<TabItem> = ArrayList<TabItem>().toMutableList()
@@ -153,7 +154,7 @@ fun TodosScreenBottomSheet(
                 {
                     Icon(Icons.Filled.Add, "")
                 }
-            }) {
+            }) { it ->
         it
         Column(
                 modifier = Modifier.fillMaxSize(),
@@ -174,7 +175,7 @@ fun TodosScreenBottomSheet(
                         if (!historySearchItem.contains(text))
                             historySearchItem.add(text)
                         active = false
-                        viewModel.getKeyTranfer()
+                        viewModel.getKeyTransfer()
                                 .postValue(
                                         Objects
                                                 .requireNonNull(
@@ -195,7 +196,7 @@ fun TodosScreenBottomSheet(
                                         if (text.isNotEmpty()) {
                                             text = ""
                                             active = false
-                                            viewModel.getKeyTranfer()
+                                            viewModel.getKeyTransfer()
                                                     .postValue(
                                                             Objects
                                                                     .requireNonNull(
@@ -220,7 +221,7 @@ fun TodosScreenBottomSheet(
                                             text = it
                                             active = false
                                             viewModel
-                                                    .getKeyTranfer()
+                                                    .getKeyTransfer()
                                                     .setValue(
                                                             Objects
                                                                     .requireNonNull(
@@ -248,7 +249,7 @@ fun TodosScreenBottomSheet(
         }
         CustomBottomSheet(
                 bottomSheetState = bottomSheetStateAdd,
-                sheetContent = { TodoAddScreenBottomSheet(viewModel, owner) })
+                sheetContent = { TodoAddScreenBottomSheet(viewModel) })
         CustomBottomSheet(
                 bottomSheetState = bottomSheetStateEdit,
                 sheetContent = { TodoEditScreenBottomSheet(viewModel, owner) })
@@ -307,7 +308,7 @@ fun TabsBS(
                     "Confirmation dialog",
                     "Do you really want to delete these todo?",
                     {
-                        var temp: MutableList<Todo> =
+                        val temp: MutableList<Todo> =
                                 TodoViewModel.checkedList.value as MutableList<Todo>
 
                         if (temp.size <= 0)
@@ -323,7 +324,7 @@ fun TabsBS(
                                             .deleteCheckedTodos()
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(Action {
+                                            .subscribe {
                                                 Toast.makeText(
                                                         mContext,
                                                         "Todos has been deleted successfully!",
@@ -332,7 +333,7 @@ fun TabsBS(
                                                 viewModel.resetUncheckedList()
                                                 viewModel.resetCheckedList()
                                                 compositeDisposable.dispose()
-                                            })
+                                            }
                             )
                         }
                         dialogOpen = false
@@ -383,15 +384,15 @@ fun AllFragmentBS(
         mutableStateListOf<Todo>()
     }
 
-    var numberItemPerPage: Int = remember { 20 }
-    var startIndex: Int = remember { 0 }
+    val numberItemPerPage: Int = remember { 20 }
+    var startIndex: Int
     var endtIndex: Int = remember { viewModel.endIndexAll }
 
     var isLoading by remember {
         mutableStateOf(viewModel.isShimmer)
     }
 
-    viewModel.getKeyTranfer().observe(owner) {
+    viewModel.getKeyTransfer().observe(owner) {
         viewModel.listTodoAll
                 .observe(owner) { item ->
                     startIndex = 0
@@ -424,7 +425,7 @@ fun AllFragmentBS(
                     },
                     itemContent =
                     { index ->
-                        val todo = todoMainList.get(index)
+                        val todo = todoMainList[index]
                         TodoItemBS(
                                 isLoading,
                                 viewModel,
@@ -445,14 +446,12 @@ fun AllFragmentBS(
                     }
                     LaunchedEffect(Unit) {
                         delay(1000)
-                        var tempList: MutableList<Todo>
                         startIndex = endtIndex
                         endtIndex += numberItemPerPage
                         if (todoAllList.size - 1 < endtIndex)
                             endtIndex = todoAllList.size
                         viewModel.endIndexAll = endtIndex
-                        tempList =
-                                todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+                        val tempList: MutableList<Todo> = todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
                         todoMainList.addAll(tempList)
                     }
                 }
@@ -475,11 +474,11 @@ fun PendingFragmentBS(
         mutableStateListOf<Todo>()
     }
 
-    var numberItemPerPage: Int = remember { 20 }
-    var startIndex: Int = remember { 0 }
+    val numberItemPerPage: Int = remember { 20 }
+    var startIndex: Int
     var endtIndex: Int = remember { viewModel.endIndexPending }
 
-    viewModel.getKeyTranfer().observe(owner) {
+    viewModel.getKeyTransfer().observe(owner) {
         viewModel.getListTodoByStatus("Pending")
                 .observe(owner) { item ->
                     startIndex = 0
@@ -506,7 +505,7 @@ fun PendingFragmentBS(
                     },
                     itemContent =
                     { index ->
-                        val todo = todoMainList.get(index)
+                        val todo = todoMainList[index]
                         TodoItemBS(
                                 false,
                                 viewModel,
@@ -527,14 +526,12 @@ fun PendingFragmentBS(
                     }
                     LaunchedEffect(Unit) {
                         delay(1000)
-                        var tempList: MutableList<Todo>
                         startIndex = endtIndex
                         endtIndex += numberItemPerPage
                         if (todoAllList.size - 1 < endtIndex)
                             endtIndex = todoAllList.size
                         viewModel.endIndexPending = endtIndex
-                        tempList =
-                                todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+                        val tempList: MutableList<Todo> = todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
                         todoMainList.addAll(tempList)
                     }
                 }
@@ -557,11 +554,11 @@ fun CompletedFragmentBS(
         mutableStateListOf<Todo>()
     }
 
-    var numberItemPerPage: Int = remember { 20 }
-    var startIndex: Int = remember { 0 }
+    val numberItemPerPage: Int = remember { 20 }
+    var startIndex: Int
     var endtIndex: Int = remember { viewModel.endIndexCompleted }
 
-    viewModel.getKeyTranfer().observe(owner) {
+    viewModel.getKeyTransfer().observe(owner) {
         viewModel.getListTodoByStatus("Completed")
                 .observe(owner) { item ->
                     startIndex = 0
@@ -588,7 +585,7 @@ fun CompletedFragmentBS(
                     },
                     itemContent =
                     { index ->
-                        val todo = todoMainList.get(index)
+                        val todo = todoMainList[index]
                         TodoItemBS(
                                 false,
                                 viewModel,
@@ -609,14 +606,12 @@ fun CompletedFragmentBS(
                     }
                     LaunchedEffect(Unit) {
                         delay(1000)
-                        var tempList: MutableList<Todo>
                         startIndex = endtIndex
                         endtIndex += numberItemPerPage
                         if (todoAllList.size - 1 < endtIndex)
                             endtIndex = todoAllList.size
                         viewModel.endIndexCompleted = endtIndex
-                        tempList =
-                                todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+                        val tempList: MutableList<Todo> = todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
                         todoMainList.addAll(tempList)
                     }
                 }

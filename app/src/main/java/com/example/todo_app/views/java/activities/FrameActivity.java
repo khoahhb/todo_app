@@ -2,22 +2,19 @@ package com.example.todo_app.views.java.activities;
 
 import static androidx.navigation.ui.NavigationUI.setupActionBarWithNavController;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.todo_app.R;
-import com.example.todo_app.databinding.FragmentTodoListBinding;
 
 public class FrameActivity extends AppCompatActivity {
-    private FragmentTodoListBinding fragmentTodoListBinding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +36,7 @@ public class FrameActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_custom,menu);
         return super.onCreateOptionsMenu(menu);
     }
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 

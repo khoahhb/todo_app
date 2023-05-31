@@ -1,6 +1,5 @@
 package com.example.todo_app.views.java.fragments;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,16 +68,13 @@ public class TodoListFragment extends Fragment {
 
         tabLayoutMediator.attach();
 
-        fragmentTodoListBinding.btnClearAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (todoViewModel.checkedList.getValue().size() == 0) {
-                    HelperFunctions.helpers
-                            .showSnackBar(view, "Nothing is selected!"
-                                    , 255, 191, 0);
-                } else {
-                    deleteSelectedTodos();
-                }
+        fragmentTodoListBinding.btnClearAll.setOnClickListener(view12 -> {
+            if (Objects.requireNonNull(TodoViewModel.checkedList.getValue()).size() == 0) {
+                HelperFunctions.helpers
+                        .showSnackBar(view12, "Nothing is selected!"
+                                , 255, 191, 0);
+            } else {
+                deleteSelectedTodos();
             }
         });
 
@@ -89,7 +85,7 @@ public class TodoListFragment extends Fragment {
                             fragmentTodoListBinding.sbSearchTodo
                                     .setText(fragmentTodoListBinding.svSearchTodo.getText());
                             fragmentTodoListBinding.svSearchTodo.hide();
-                            todoViewModel.getKeyTranfer()
+                            todoViewModel.getKeyTransfer()
                                     .postValue(Objects
                                             .requireNonNull(fragmentTodoListBinding.svSearchTodo
                                                     .getText()).toString());
@@ -98,7 +94,7 @@ public class TodoListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         fragmentTodoListBinding = FragmentTodoListBinding.inflate(inflater, container, false);
         View mView = fragmentTodoListBinding.getRoot();
@@ -108,32 +104,26 @@ public class TodoListFragment extends Fragment {
     }
 
     private void deleteSelectedTodos() {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
         builder.setTitle("Confirmation dialog")
                 .setMessage("Do you really want to delete selected todos?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        CompositeDisposable compositeDisposable = new CompositeDisposable();
-                        compositeDisposable.add(todoViewModel
-                                .deleteCheckedTodos()
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> {
-                                    HelperFunctions.helpers
-                                            .showSnackBar(getView(), "Data been deleted successfully!"
-                                                    , 25, 135, 84);
-                                    todoViewModel.resetUncheckedList();
-                                    todoViewModel.resetCheckedList();
-                                    compositeDisposable.dispose();
-                                })
-                        );
-                    }
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    CompositeDisposable compositeDisposable = new CompositeDisposable();
+                    compositeDisposable.add(todoViewModel
+                            .deleteCheckedTodos()
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(() -> {
+                                HelperFunctions.helpers
+                                        .showSnackBar(getView(), "Data been deleted successfully!"
+                                                , 25, 135, 84);
+                                todoViewModel.resetUncheckedList();
+                                todoViewModel.resetCheckedList();
+                                compositeDisposable.dispose();
+                            })
+                    );
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
+                .setNegativeButton("Cancel", (dialog, which) -> {
                 })
                 .setCancelable(false)
                 .show();

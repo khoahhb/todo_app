@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_EXPRESSION")
+
 package com.example.todo_app.views.jetpack
 
 import android.content.Intent
@@ -19,20 +21,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
-import com.example.todo_app.view_models.TodoViewModel
 import com.example.todo_app.views.java.activities.FrameActivity
 
 
 @Composable
-fun SwitchScreen(viewModel: TodoViewModel,
-                 owner: LifecycleOwner,
-                 navController: NavHostController) {
+fun SwitchScreen(navController: NavHostController) {
 
     val mContext = LocalContext.current
 
-    Scaffold() {
+    Scaffold {
         it
         Column(
                 modifier = Modifier.fillMaxSize(),

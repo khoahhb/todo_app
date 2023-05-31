@@ -15,15 +15,4 @@ public class HelperFunctions {
                 .setBackgroundTint(Color.rgb(red, green, blue))
                 .show();
     }
-
-    public boolean isNullOrEmpty(String s) {
-        if (s == null) {
-            return true;
-        } else {
-            if (s.isEmpty() || s.trim().isEmpty()) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

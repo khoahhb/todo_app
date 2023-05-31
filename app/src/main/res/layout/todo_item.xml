@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    >
-
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardItem"
-        android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:outlineProvider="none"
         android:transitionName="edit"
         app:strokeWidth="0dp">
@@ -37,21 +35,23 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGoDetail"
-                    android:contentDescription="Go Detail Button"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center"
-                    android:gravity="center"
                     android:background="@android:color/transparent"
+                    android:contentDescription="Go Detail Button"
+                    android:gravity="center"
                     android:minWidth="0dp"
                     app:icon="@drawable/ic_detail"
-                    app:iconPadding="0dp"
                     app:iconGravity="start"
+                    app:iconPadding="0dp"
                     app:iconTint="@color/md_theme_light_outline"
                     app:layout_constraintEnd_toEndOf="parent"
                     tools:ignore="MissingConstraints" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </RelativeLayout>
+
     </com.google.android.material.card.MaterialCardView>
+
 </layout>

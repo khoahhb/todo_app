@@ -45,7 +45,7 @@ public class TodoAddFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //Set transition
         Transition transition = TransitionInflater.from(requireContext())
@@ -72,75 +72,65 @@ public class TodoAddFragment extends Fragment {
 
 
         //Show date picker
-        fragmentTodoAddBinding.tieAddCreatedDate.setOnClickListener(view13 -> {
-            showDatePicker(fragmentTodoAddBinding.tieAddCreatedDate);
-        });
+        fragmentTodoAddBinding.tieAddCreatedDate.setOnClickListener(view13 -> showDatePicker(fragmentTodoAddBinding.tieAddCreatedDate));
 
-        fragmentTodoAddBinding.tieAddCompletedDate.setOnClickListener(view13 -> {
-            showDatePicker(fragmentTodoAddBinding.tieAddCompletedDate);
-        });
+        fragmentTodoAddBinding.tieAddCompletedDate.setOnClickListener(view13 -> showDatePicker(fragmentTodoAddBinding.tieAddCompletedDate));
 
         //Handle add button
-        fragmentTodoAddBinding.btnAddTodo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        fragmentTodoAddBinding.btnAddTodo.setOnClickListener(view1 -> {
 
-                Todo todo = new Todo();
+            Todo todo = new Todo();
 
-                todo.setTitle(fragmentTodoAddBinding.tieAddTitle.getText().toString());
-                todo.setStatus(fragmentTodoAddBinding.tieAddStatus.getText().toString().trim());
-                todo.setDescription(fragmentTodoAddBinding.tieAddDescription.getText().toString());
-                todo.setCreatedDate(fragmentTodoAddBinding.tieAddCreatedDate.getText().toString());
-                todo.setCompletedDate(fragmentTodoAddBinding.tieAddCompletedDate.getText().toString());
+            todo.setTitle(Objects.requireNonNull(fragmentTodoAddBinding.tieAddTitle.getText()).toString());
+            todo.setStatus(fragmentTodoAddBinding.tieAddStatus.getText().toString().trim());
+            todo.setDescription(Objects.requireNonNull(fragmentTodoAddBinding.tieAddDescription.getText()).toString());
+            todo.setCreatedDate(Objects.requireNonNull(fragmentTodoAddBinding.tieAddCreatedDate.getText()).toString());
+            todo.setCompletedDate(Objects.requireNonNull(fragmentTodoAddBinding.tieAddCompletedDate.getText()).toString());
 
-                if (isNullOrEmpty(todo.getTitle()) || isNullOrEmpty(todo.getStatus())
-                        || isNullOrEmpty(todo.getDescription()) || isNullOrEmpty(todo.getCreatedDate())
-                        || isNullOrEmpty(todo.getCompletedDate())) {
+            if (isNullOrEmpty(todo.getTitle()) || isNullOrEmpty(todo.getStatus())
+                    || isNullOrEmpty(todo.getDescription()) || isNullOrEmpty(todo.getCreatedDate())
+                    || isNullOrEmpty(todo.getCompletedDate())) {
+                HelperFunctions.helpers
+                        .showSnackBar(view1, "Some fields are missing!"
+                                , 255, 51, 51);
+            } else {
+                try {
+                    CompositeDisposable compositeDisposable = new CompositeDisposable();
+                    compositeDisposable.add(todoViewModel
+                            .insertTodo(todo)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(() -> {
+                                HelperFunctions.helpers
+                                        .showSnackBar(view1, "Data has been saved successfully!"
+                                                , 25, 135, 84);
+                                Navigation.findNavController(requireView()).popBackStack(R.id.todoListFragment, true);
+                                compositeDisposable.dispose();
+                            })
+                    );
+                } catch (Exception e) {
                     HelperFunctions.helpers
-                            .showSnackBar(view, "Some fields are missing!"
+                            .showSnackBar(view1, e.toString()
                                     , 255, 51, 51);
-                } else {
-                    try {
-                        CompositeDisposable compositeDisposable = new CompositeDisposable();
-                        compositeDisposable.add(todoViewModel
-                                .insertTodo(todo)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> {
-                                    HelperFunctions.helpers
-                                            .showSnackBar(view, "Data has been saved successfully!"
-                                                    , 25, 135, 84);
-                                    Navigation.findNavController(getView()).popBackStack(R.id.todoListFragment, true);
-                                    compositeDisposable.dispose();
-                                })
-                        );
-                    } catch (Exception e) {
-                        HelperFunctions.helpers
-                                .showSnackBar(view, e.toString()
-                                        , 255, 51, 51);
-                    }
                 }
             }
         });
 
         //Handle add test data
-        fragmentTodoAddBinding.btnAddTestData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
+        fragmentTodoAddBinding.btnAddTestData.setOnClickListener(view12 -> {
+            try {
 
-                    for (int i = 1; i < 300; i++) {
-                        Todo todoTemp = new Todo("Item " + i, "desc", "Pending",
-                                "2023-14-11", "2023-14-11");
-                        testFunct(todoTemp);
-                    }
-                    Navigation.findNavController(getView()).popBackStack(R.id.todoListFragment, true);
-
-                } catch (Exception e) {
-                    HelperFunctions.helpers
-                            .showSnackBar(view, e.toString()
-                                    , 255, 51, 51);
+                for (int i = 1; i < 300; i++) {
+                    Todo todoTemp = new Todo("Item " + i, "desc", "Pending",
+                            "2023-14-11", "2023-14-11");
+                    testFunct(todoTemp);
                 }
+                Navigation.findNavController(requireView()).popBackStack(R.id.todoListFragment, true);
+
+            } catch (Exception e) {
+                HelperFunctions.helpers
+                        .showSnackBar(view12, e.toString()
+                                , 255, 51, 51);
             }
         });
 
@@ -211,11 +201,8 @@ public class TodoAddFragment extends Fragment {
         if (s == null) {
             return true;
         } else {
-            if (s.isEmpty() || s.trim().isEmpty()) {
-                return true;
-            }
+            return s.isEmpty() || s.trim().isEmpty();
         }
-        return false;
     }
 
     public void testFunct(Todo todo) {
@@ -224,8 +211,6 @@ public class TodoAddFragment extends Fragment {
                 .insertTodo(todo)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    compositeDisposable.dispose();
-                }));
+                .subscribe(compositeDisposable::dispose));
     }
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="TodoPendingViewModel"
             type="com.example.todo_app.view_models.TodoViewModel" />
@@ -13,23 +13,22 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".views.java.fragments.TodoPendingFragment"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:context=".views.java.fragments.TodoPendingFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rclvTodoPending"
-            android:scrollbars="vertical"
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:transitionGroup="true"
-            />
+            android:layout_marginTop="20dp"
+            android:scrollbars="vertical"
+            android:transitionGroup="true" />
 
         <ProgressBar
             android:id="@+id/isLoadingTodoPending"
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" />
 
     </LinearLayout>
 </layout>

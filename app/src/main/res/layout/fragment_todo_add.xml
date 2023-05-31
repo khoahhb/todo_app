@@ -5,6 +5,7 @@
     tools:context=".views.java.fragments.TodoAddFragment">
 
     <data>
+
         <variable
             name="TodoAddViewModel"
             type="com.example.todo_app.view_models.TodoViewModel" />
@@ -13,45 +14,49 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:transitionName="add_fragment"
-        >
+        android:orientation="vertical"
+        android:transitionName="add_fragment">
+
         <TextView
             android:id="@+id/text_view_id"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="Add Todo Page"
-            android:textSize="34dp"
+            android:text="@string/add_todo_page"
             android:textAllCaps="true"
-            android:textStyle="bold"
-            android:textColor="@color/md_theme_light_primary"/>
+            android:textColor="@color/md_theme_light_primary"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilAddStatus"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
             android:layout_marginRight="30dp"
-            android:hint="Select status"
-            app:boxCornerRadiusTopEnd="10dp"
+            android:hint="@string/select_status"
+            android:orientation="horizontal"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
             app:boxStrokeWidth="3dp"
-            android:orientation="horizontal"
             app:errorEnabled="true">
 
             <AutoCompleteTextView
                 android:id="@+id/tieAddStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textColorHint="#8D6E63"
                 app:simpleItems="@array/simple_items"
-                android:inputType="none" />
+                tools:ignore="LabelFor,VisualLintTextFieldSize,TextContrastCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilAddTitle"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -60,21 +65,22 @@
             android:layout_marginLeft="30dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="30dp"
-            app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
             app:boxStrokeWidth="3dp"
-            app:errorEnabled="true"
-            app:endIconMode="clear_text">
+            app:endIconMode="clear_text"
+            app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/tieAddTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter tile"
+                android:hint="@string/enter_tile"
                 android:inputType="text"
-                />
+                android:textColorHint="#8D6E63"
+                tools:ignore="VisualLintTextFieldSize,TextContrastCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -86,21 +92,22 @@
             android:layout_marginLeft="30dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="30dp"
-            app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
             app:boxStrokeWidth="3dp"
-            app:errorEnabled="true"
             app:endIconMode="clear_text"
-            >
+            app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/tieAddDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter description"
-                android:inputType="text" />
+                android:hint="@string/enter_description"
+                android:inputType="text"
+                android:textColorHint="#8D6E63"
+                tools:ignore="VisualLintTextFieldSize,TextContrastCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -112,9 +119,9 @@
             android:layout_marginLeft="30dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="30dp"
-            app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
             app:boxStrokeWidth="3dp"
             app:errorEnabled="true">
@@ -124,8 +131,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusable="false"
-                android:hint="Enter created date"
-                android:inputType="text" />
+                android:hint="@string/enter_created_date"
+                android:inputType="text"
+                android:textColorHint="#8D6E63"
+                tools:ignore="VisualLintTextFieldSize,TextContrastCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -137,9 +146,9 @@
             android:layout_marginLeft="30dp"
             android:layout_marginTop="15dp"
             android:layout_marginRight="30dp"
-            app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
             app:boxStrokeWidth="3dp"
             app:errorEnabled="true">
@@ -149,8 +158,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusable="false"
-                android:hint="Enter completed date"
-                android:inputType="text" />
+                android:hint="@string/enter_completed_date"
+                android:inputType="text"
+                android:textColorHint="#8D6E63"
+                tools:ignore="VisualLintTextFieldSize,TextContrastCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -159,21 +170,22 @@
             style="@style/Widget.Material3.Button.Icon"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="Add"
-            android:textColor="@color/white"
+            android:text="@string/add"
             android:textAlignment="center"
-            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
             android:textStyle="bold"
             tools:ignore="TextSizeCheck" />
+
         <Button
             android:id="@+id/btnAddTestData"
             style="@style/Widget.Material3.Button.Icon"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="Add Test Data"
-            android:textColor="@color/white"
+            android:text="@string/add_test_data"
             android:textAlignment="center"
-            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
             android:textStyle="bold"
             tools:ignore="TextSizeCheck" />
 

@@ -1,6 +1,7 @@
+@file:Suppress("UNUSED_EXPRESSION")
+
 package com.example.todo_app.views.jetpack
 
-import android.widget.Toast
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -10,8 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,19 +27,15 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,14 +49,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
@@ -71,7 +63,6 @@ typealias ComposableFun = @Composable () -> Unit
 
 class TabItem(var title: String, var screen: ComposableFun)
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 @Composable
 fun CustomTextField(
         label: String,
@@ -110,7 +101,7 @@ fun CustomTextField(
     Text(text = error, color = Color.Red)
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDatePicker(
         label: String,
@@ -162,11 +153,10 @@ fun CustomDatePicker(
     Text(text = error, color = Color.Red)
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CustomDropdown(
         label: String,
-        value: String,
         onSelectionChange: (String) -> Unit,
         editStatus: String) {
 
@@ -175,7 +165,7 @@ fun CustomDropdown(
 
     val todoStatus = arrayOf("Pending", "Completed")
     var index = 0
-    if (todoStatus[1].equals(editStatus)) index = 1
+    if (todoStatus[1] == editStatus) index = 1
 
     selectedText = todoStatus[index]
 
@@ -308,7 +298,7 @@ fun Modifier.shimmerEffect(): Modifier = composed {
 }
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTopAppBar(
         isBS: Boolean,
@@ -319,7 +309,7 @@ fun CustomTopAppBar(
 ) {
 
     var showMenu by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+    LocalContext.current
 
     TopAppBar(
             modifier = Modifier

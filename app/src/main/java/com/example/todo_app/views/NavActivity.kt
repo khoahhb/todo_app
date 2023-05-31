@@ -1,6 +1,7 @@
+@file:Suppress("UNUSED_EXPRESSION")
+
 package com.example.todo_app.views
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +10,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
@@ -17,7 +17,6 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.todo_app.models.Todo
 import com.example.todo_app.view_models.TodoViewModel
-import com.example.todo_app.views.java.activities.FrameActivity
 import com.example.todo_app.views.jetpack.SwitchScreen
 import com.example.todo_app.views.jetpack.TodoAddScreen
 import com.example.todo_app.views.jetpack.TodoEditScreen
@@ -67,8 +66,6 @@ fun MainFrame(
                         }
                     },) {
                 SwitchScreen(
-                        viewModel = viewModel,
-                        owner = owner,
                         navController = navController
                 )
             }
@@ -130,9 +127,8 @@ fun MainFrame(
                     }
                 }) {
                 TodoAddScreen(
-                    viewModel = viewModel,
-                    owner = owner,
-                    navController = navController
+                        viewModel = viewModel,
+                        navController = navController
                 )
             }
             composable("edit_todo_page/{todo}",
@@ -152,14 +148,13 @@ fun MainFrame(
                 val todoJson = backStackEntry.arguments?.getString("todo")
                 val moshi = Moshi.Builder().build()
                 val jsonAdapter = moshi.adapter(Todo::class.java).lenient()
-                val todoObjet = jsonAdapter.fromJson(todoJson)
+                val todoObjet = todoJson?.let { jsonAdapter.fromJson(it) }
 
                 if (todoObjet != null) {
                     TodoEditScreen(
-                        viewModel = viewModel,
-                        owner = owner,
-                        navController = navController,
-                        todo = todoObjet
+                            viewModel = viewModel,
+                            todo = todoObjet,
+                            navController = navController
                     )
                 }
             }

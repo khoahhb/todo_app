@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class CustomLinearLayoutManager extends LinearLayoutManager {
 
-    private int extraSpaceStart;
-    private int extraSpaceEnd;
+    private final int extraSpaceStart;
+    private final int extraSpaceEnd;
 
     // Constructor
     public CustomLinearLayoutManager(Context context, int extraSpaceStart, int extraSpaceEnd) {

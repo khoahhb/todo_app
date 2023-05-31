@@ -1,9 +1,8 @@
+@file:Suppress("UNUSED_EXPRESSION", "UNUSED_EXPRESSION")
+
 package com.example.todo_app.views.jetpack
 
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,7 +50,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -74,13 +72,12 @@ import com.google.accompanist.pager.rememberPagerState
 import com.squareup.moshi.Moshi
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Action
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Objects
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun TodosScreen(
         viewModel: TodoViewModel,
@@ -89,7 +86,7 @@ fun TodosScreen(
 ) {
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
-    var historySearchItem = remember { mutableStateListOf("") }
+    val historySearchItem = remember { mutableStateListOf("") }
     historySearchItem.remove("")
     val pagerState = rememberPagerState()
     val tabs: MutableList<TabItem> = ArrayList<TabItem>().toMutableList()
@@ -118,14 +115,14 @@ fun TodosScreen(
             },
             topBar = { CustomTopAppBar(false, {navController.navigateUp()},{navController.navigate("switch")},{navController.navigate("todos_page")},{navController.navigate("add_todo_page")})  },
 
-            ) {
+            ) { it ->
         it
         Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
-            androidx.compose.material3.Text(
+            Text(
                     text = "Main screen",
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 34.sp,
@@ -140,7 +137,7 @@ fun TodosScreen(
                         if (!historySearchItem.contains(text))
                             historySearchItem.add(text)
                         active = false
-                        viewModel.getKeyTranfer()
+                        viewModel.getKeyTransfer()
                                 .postValue(
                                         Objects
                                                 .requireNonNull(
@@ -159,7 +156,7 @@ fun TodosScreen(
                                         if (text.isNotEmpty()) {
                                             text = ""
                                             active = false
-                                            viewModel.getKeyTranfer()
+                                            viewModel.getKeyTransfer()
                                                     .postValue(
                                                             Objects
                                                                     .requireNonNull(
@@ -185,7 +182,7 @@ fun TodosScreen(
                                             text = it
                                             active = false
                                             viewModel
-                                                    .getKeyTranfer()
+                                                    .getKeyTransfer()
                                                     .setValue(
                                                             Objects
                                                                     .requireNonNull(
@@ -209,8 +206,8 @@ fun TodosScreen(
 
             }
             Spacer(modifier = Modifier.size(16.dp))
-            Tabs(tabs, pagerState, viewModel, navController)
-            TabContent(tabs = tabs, pagerState = pagerState, viewModel, navController)
+            Tabs(tabs, pagerState, viewModel)
+            TabContent(tabs = tabs, pagerState = pagerState)
         }
     }
 }
@@ -220,8 +217,7 @@ fun TodosScreen(
 fun Tabs(
         tabs: List<TabItem>,
         pagerState: PagerState,
-        viewModel: TodoViewModel,
-        navController: NavHostController
+        viewModel: TodoViewModel
 ) {
     var dialogOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -268,7 +264,7 @@ fun Tabs(
                     "Do you really want to delete these todo?",
                     {
 
-                        var temp: MutableList<Todo> = TodoViewModel.checkedList.value as MutableList<Todo>
+                        val temp: MutableList<Todo> = TodoViewModel.checkedList.value as MutableList<Todo>
 
                         if (temp.size <= 0)
                             Toast.makeText(
@@ -283,7 +279,7 @@ fun Tabs(
                                             .deleteCheckedTodos()
                                             .subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(Action {
+                                            .subscribe {
                                                 Toast.makeText(
                                                         mContext,
                                                         "Todos has been deleted successfully!",
@@ -292,7 +288,7 @@ fun Tabs(
                                                 viewModel.resetUncheckedList()
                                                 viewModel.resetCheckedList()
                                                 compositeDisposable.dispose()
-                                            })
+                                            }
                             )
                         }
                         dialogOpen = false
@@ -319,9 +315,7 @@ fun Tabs(
 @Composable
 fun TabContent(
         tabs: List<TabItem>,
-        pagerState: PagerState,
-        viewModel: TodoViewModel,
-        navController: NavHostController
+        pagerState: PagerState
 ) {
     HorizontalPager(count = tabs.size, state = pagerState) { page ->
         tabs[page].screen()
@@ -339,15 +333,15 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
         mutableStateListOf<Todo>()
     }
 
-    var numberItemPerPage: Int = remember { 20 }
-    var startIndex: Int = remember { 0 }
+    val numberItemPerPage: Int = remember { 20 }
+    var startIndex: Int
     var endtIndex: Int = remember { viewModel.endIndexAll }
 
     var isLoading by remember {
         mutableStateOf(viewModel.isShimmer)
     }
 
-    viewModel.getKeyTranfer().observe(owner) {
+    viewModel.getKeyTransfer().observe(owner) {
         viewModel.listTodoAll
                 .observe(owner) { item ->
                     startIndex = 0
@@ -377,7 +371,7 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
                         todoMainList[it].id
                     },
                     itemContent = { index ->
-                        val todo = todoMainList.get(index)
+                        val todo = todoMainList[index]
                         TodoItem(
                                 isLoading,
                                 viewModel,
@@ -398,14 +392,12 @@ fun AllFragment(viewModel: TodoViewModel, owner: LifecycleOwner, navController: 
                     }
                     LaunchedEffect(Unit) {
                         delay(1000)
-                        var tempList: MutableList<Todo>
                         startIndex = endtIndex
                         endtIndex += numberItemPerPage
                         if (todoAllList.size - 1 < endtIndex)
                             endtIndex = todoAllList.size
                         viewModel.endIndexAll = endtIndex
-                        tempList =
-                                todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+                        val tempList: MutableList<Todo> = todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
                         todoMainList.addAll(tempList)
                     }
                 }
@@ -429,11 +421,11 @@ fun PendingFragment(
         mutableStateListOf<Todo>()
     }
 
-    var numberItemPerPage: Int = remember { 20 }
-    var startIndex: Int = remember { 0 }
+    val numberItemPerPage: Int = remember { 20 }
+    var startIndex: Int
     var endtIndex: Int = remember { viewModel.endIndexPending }
 
-    viewModel.getKeyTranfer().observe(owner) {
+    viewModel.getKeyTransfer().observe(owner) {
         viewModel.getListTodoByStatus("Pending")
                 .observe(owner) { item ->
                     startIndex = 0
@@ -456,7 +448,7 @@ fun PendingFragment(
                         todoMainList[it].id
                     },
                     itemContent = { index ->
-                        val todo = todoMainList.get(index)
+                        val todo = todoMainList[index]
                         TodoItem(
                                 false,
                                 viewModel,
@@ -478,14 +470,12 @@ fun PendingFragment(
                     }
                     LaunchedEffect(Unit) {
                         delay(1000)
-                        var tempList: MutableList<Todo>
                         startIndex = endtIndex
                         endtIndex += numberItemPerPage
                         if (todoAllList.size - 1 < endtIndex)
                             endtIndex = todoAllList.size
                         viewModel.endIndexPending = endtIndex
-                        tempList =
-                                todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+                        val tempList: MutableList<Todo> = todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
                         todoMainList.addAll(tempList)
                     }
                 }
@@ -509,11 +499,11 @@ fun CompletedFragment(
         mutableStateListOf<Todo>()
     }
 
-    var numberItemPerPage: Int = remember { 20 }
-    var startIndex: Int = remember { 0 }
+    val numberItemPerPage: Int = remember { 20 }
+    var startIndex: Int
     var endtIndex: Int = remember { viewModel.endIndexCompleted }
 
-    viewModel.getKeyTranfer().observe(owner) {
+    viewModel.getKeyTransfer().observe(owner) {
         viewModel.getListTodoByStatus("Completed")
                 .observe(owner) { item ->
                     startIndex = 0
@@ -536,7 +526,7 @@ fun CompletedFragment(
                         todoMainList[it].id
                     },
                     itemContent = { index ->
-                        val todo = todoMainList.get(index)
+                        val todo = todoMainList[index]
                         TodoItem(
                                 false,
                                 viewModel,
@@ -558,14 +548,12 @@ fun CompletedFragment(
                     }
                     LaunchedEffect(Unit) {
                         delay(1000)
-                        var tempList: MutableList<Todo>
                         startIndex = endtIndex
                         endtIndex += numberItemPerPage
                         if (todoAllList.size - 1 < endtIndex)
                             endtIndex = todoAllList.size
                         viewModel.endIndexCompleted = endtIndex
-                        tempList =
-                                todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
+                        val tempList: MutableList<Todo> = todoAllList.slice(startIndex until endtIndex) as MutableList<Todo>
                         todoMainList.addAll(tempList)
                     }
                 }
@@ -622,13 +610,13 @@ fun TodoItem(
 
                         }
                 )
-                androidx.compose.material3.Text(
+                Text(
                         modifier = Modifier
                                 .padding(start = 16.dp)
                                 .fillMaxWidth(fraction = 0.5f),
                         text = "",
                 )
-                androidx.compose.material3.Text(
+                Text(
                         fontSize = 11.sp,
                         modifier = Modifier
                                 .padding(start = 6.dp)
@@ -732,7 +720,7 @@ fun TodoItem(
                                             .adapter(Todo::class.java)
                                             .lenient()
                                     val todoItemJson = jsonAdapter.toJson(todoItem)
-                                    navController.navigate("edit_todo_page/" + todoItemJson)
+                                    navController.navigate("edit_todo_page/$todoItemJson")
                                 }
                                 .size(32.dp)
                                 .fillMaxWidth(fraction = 0.2f),

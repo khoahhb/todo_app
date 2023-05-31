@@ -5,6 +5,7 @@
     tools:context=".views.java.fragments.TodoListFragment">
 
     <data>
+
         <variable
             name="TodoListViewModel"
             type="com.example.todo_app.view_models.TodoViewModel" />
@@ -21,15 +22,16 @@
 
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
-                android:background="@color/white"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@color/white">
 
                 <com.google.android.material.search.SearchBar
                     android:id="@+id/sbSearchTodo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/add_a_new_task"
                     android:minHeight="50dp"
-                    android:hint="Add a new task" />
+                    tools:ignore="SpeakableTextPresentCheck" />
             </com.google.android.material.appbar.AppBarLayout>
         </RelativeLayout>
 
@@ -37,9 +39,8 @@
             android:id="@+id/svSearchTodo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Search todo"
-            app:layout_anchor="@id/sbSearchTodo">
-        </com.google.android.material.search.SearchView>
+            android:hint="@string/search_todo"
+            app:layout_anchor="@id/sbSearchTodo"></com.google.android.material.search.SearchView>
 
 
         <RelativeLayout
@@ -49,16 +50,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="#fff"
                 android:layout_marginTop="100dp"
+                android:background="#fff"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:paddingLeft="10dp">
+                tools:ignore="UselessParent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_weight="1"
-                    android:layout_height="0dp">
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
@@ -68,48 +71,50 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
+
                             <com.google.android.material.tabs.TabLayout
                                 android:id="@+id/tabStatus"
                                 android:layout_width="0dp"
+                                android:layout_height="50dp"
                                 android:layout_weight="1"
-                                android:layout_height="50dp" />
+                                tools:ignore="SpeakableTextPresentCheck" />
 
                             <Button
                                 android:id="@+id/btnClearAll"
                                 style="@style/Widget.Material3.Button.Icon"
-                                android:backgroundTint="@color/md_theme_light_error"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:paddingLeft="20dp"
-                                android:text="Clear"
+                                android:backgroundTint="@color/md_theme_light_error"
+                                android:paddingStart="20dp"
+                                android:text="@string/clear"
                                 android:textColor="@color/white"
-                                android:textSize="38px"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
-                                tools:ignore="TextSizeCheck" />
+                                tools:ignore="RtlSymmetry,TextSizeCheck" />
                         </LinearLayout>
 
                         <androidx.viewpager2.widget.ViewPager2
                             android:id="@+id/vpgContent"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_marginBottom="80dp"
-                            android:layout_marginRight="5dp"
+                            android:layout_below="@+id/header"
                             android:layout_marginLeft="5dp"
-                            android:layout_below="@+id/header" />
+                            android:layout_marginRight="5dp"
+                            android:layout_marginBottom="80dp" />
 
                     </RelativeLayout>
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/btnGoAdd"
-                        android:transitionName="add"
-                        android:layout_gravity="end"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
                         android:layout_marginEnd="8dp"
                         android:layout_marginBottom="16dp"
                         android:backgroundTint="@color/md_theme_dark_primaryContainer"
                         android:contentDescription="@string/touch_to_add_new_drink"
                         android:src="@drawable/ic_add"
+                        android:transitionName="add"
                         app:fabSize="auto"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

@@ -3,6 +3,6 @@
     android:duration="450"
     android:interpolator="@android:interpolator/fast_out_linear_in"
     android:transitionOrdering="sequential">
-    <fade/>
-    <changeBounds/>
+    <fade />
+    <changeBounds />
 </transitionSet>

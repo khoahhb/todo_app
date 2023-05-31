@@ -1,5 +1,6 @@
 package com.example.todo_app.adapters;
 
+import android.annotation.SuppressLint;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.example.todo_app.view_models.TodoViewModel;
 import com.example.todo_app.R;
 
 import java.util.List;
+import java.util.Objects;
 
 public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -29,14 +31,15 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Todo> mTodoList;
 
-    private TodoClickListener mTodoClickListener;
+    private final TodoClickListener mTodoClickListener;
 
-    private TodoViewModel todoViewModel;
+    private final TodoViewModel todoViewModel;
 
     public interface TodoClickListener {
         void onGoDetailItem(Todo todo, CardView cardView);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setData(List<Todo> list) {
         this.mTodoList = list;
         notifyDataSetChanged();
@@ -104,7 +107,7 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             Todo todo = mTodoList.get(position);
             TodoViewHolder todoViewHolder = (TodoViewHolder) holder;
             Animation animation = AnimationUtils.loadAnimation(todoViewHolder.itemView.getContext(), R.anim.enlarge);
-            todoViewHolder.bind(todo,position);
+            todoViewHolder.bind(todo);
             todoViewHolder.itemView.startAnimation(animation);
         }
     }
@@ -133,15 +136,13 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.todoItemBinding = itemTodoBinding;
         }
 
-        public void bind(Todo todo, int position) {
+        public void bind(Todo todo) {
 
             todoItemBinding.ckbTitle.setText(todo.getTitle());
-//            todoItemBinding.ckbTitle.setText("Item " + todo.getId());
-
 
             List<Todo> checkedList = todoViewModel.getCheckedList().getValue();
 
-            if(checkedList.contains(todo)){
+            if(Objects.requireNonNull(checkedList).contains(todo)){
                 todoItemBinding.ckbTitle.setChecked(true);
                 todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             }else{
@@ -149,39 +150,28 @@ public class TodoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() & ~ Paint.STRIKE_THRU_TEXT_FLAG);
             }
 
-            todoItemBinding.btnGoDetail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mTodoClickListener.onGoDetailItem(todo, todoItemBinding.cardItem);
+            todoItemBinding.btnGoDetail.setOnClickListener(view -> mTodoClickListener.onGoDetailItem(todo, todoItemBinding.cardItem));
+
+            todoItemBinding.cardItem.setOnClickListener(view -> {
+
+                todoItemBinding.ckbTitle.setChecked(!todoItemBinding.ckbTitle.isChecked());
+                if (todoItemBinding.ckbTitle.isChecked()) {
+                    todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    todoViewModel.setCheckItem(todo,true);
+                } else {
+                    todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() & ~ Paint.STRIKE_THRU_TEXT_FLAG);
+                    todoViewModel.setCheckItem(todo,false);
                 }
+
             });
 
-            todoItemBinding.cardItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    todoItemBinding.ckbTitle.setChecked(!todoItemBinding.ckbTitle.isChecked());
-                    if (todoItemBinding.ckbTitle.isChecked()) {
-                        todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                        todoViewModel.setCheckItem(todo,true);
-                    } else {
-                        todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() & ~ Paint.STRIKE_THRU_TEXT_FLAG);
-                        todoViewModel.setCheckItem(todo,false);
-                    }
-
-                }
-            });
-
-            todoItemBinding.ckbTitle.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (todoItemBinding.ckbTitle.isChecked()) {
-                        todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                        todoViewModel.setCheckItem(todo,true);
-                    } else {
-                        todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() & ~ Paint.STRIKE_THRU_TEXT_FLAG);
-                        todoViewModel.setCheckItem(todo,false);
-                    }
+            todoItemBinding.ckbTitle.setOnClickListener(view -> {
+                if (todoItemBinding.ckbTitle.isChecked()) {
+                    todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    todoViewModel.setCheckItem(todo,true);
+                } else {
+                    todoItemBinding.ckbTitle.setPaintFlags(todoItemBinding.ckbTitle.getPaintFlags() & ~ Paint.STRIKE_THRU_TEXT_FLAG);
+                    todoViewModel.setCheckItem(todo,false);
                 }
             });
         }
